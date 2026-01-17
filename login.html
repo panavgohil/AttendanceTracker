@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Login</title>
+<style>
+  :root{ --bg:#0f172a; --card:rgba(30,41,59,0.7); --text:white; --accent:#3b82f6; }
+  body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:center;height:100vh;}
+  .wrap{width:380px;padding:30px;background:var(--card);border-radius:16px;border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px);}
+  input,select{width:100%;padding:12px;margin:8px 0;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:white;border-radius:8px;box-sizing:border-box;}
+  select option { background: #1e293b; color: white; }
+  button.primary{ width:100%; padding:12px; background:var(--accent); border:none; border-radius:8px; color:white; font-weight:bold; margin-top:15px; cursor:pointer; display: flex; justify-content: center; align-items: center; min-height: 45px; }
+  button:disabled{opacity:0.7;cursor:not-allowed;}
+  .link{color:#94a3b8;font-size:13px;text-decoration:underline;cursor:pointer;background:none;border:none;}
+  .hidden{display:none;}
+  .notice{padding:10px;margin-top:10px;border-radius:6px;font-size:13px;text-align:center;display:none;}
+  .notice.err{background:rgba(220,38,38,0.2);color:#fca5a5;}
+  .notice.ok{background:rgba(22,163,74,0.2);color:#86efac;}
+  .loader { width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s ease-in-out infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2 style="text-align:center;margin-top:0">Attendance App</h2>
+  <div id="viewLogin">
+    <select id="loginMethod" onchange="toggleLogin()"><option value="roll">Roll Number</option><option value="email">Email</option></select>
+    <input id="loginRoll" placeholder="Roll Number">
+    <input id="loginEmail" placeholder="Email" class="hidden">
+    <input id="loginPass" type="password" placeholder="Password">
+    <button class="primary" id="btnLogin" onclick="doLogin()">Login</button>
+    <div style="text-align:center;margin-top:15px;">
+      <button class="link" onclick="setView('reg')">Register</button>
+      <button class="link" onclick="setView('forgot')">Forgot Password?</button>
+    </div>
+  </div>
+  <div id="viewReg" class="hidden">
+    <h3>Register</h3>
+    <div id="regStep1">
+      <input id="regName" placeholder="Full Name">
+      <input id="regRoll" placeholder="Roll Number">
+      <input id="regEmail" placeholder="Email">
+      <select id="regBranch"><option value="" disabled selected>Select Branch</option><option value="MCE-1">MCE-1</option><option value="MCE-2">MCE-2</option><option value="MCE-3">MCE-3</option><option value="EP-1">EP-1</option><option value="EP-2">EP-2</option><option value="BT">BT</option><option value="CE-1">CE-1</option><option value="CE-2">CE-2</option><option value="CSE-1">CSE-1</option><option value="CSE-2">CSE-2</option><option value="CSE-3">CSE-3</option><option value="CSE-4">CSE-4</option><option value="CSE-5">CSE-5</option><option value="CSE-6">CSE-6</option><option value="DSA">DSA</option><option value="EE-1">EE-1</option><option value="EE-2">EE-2</option><option value="EE-3">EE-3</option><option value="EE-4">EE-4</option><option value="EE-5">EE-5</option><option value="ECE-1">ECE-1</option><option value="ECE-2">ECE-2</option><option value="ECE-3">ECE-3</option><option value="VLSI">VLSI</option><option value="ENE">ENE</option><option value="IT-1">IT-1</option><option value="IT-2">IT-2</option><option value="CY">Cyber Security</option><option value="ME-1">ME-1</option><option value="ME-2">ME-2</option><option value="ME-3">ME-3</option><option value="ME-4">ME-4</option><option value="AE">AE</option><option value="PIE">PIE</option><option value="SE-1">SE-1</option><option value="SE-2">SE-2</option><option value="SE-3">SE-3</option><option value="CHE">CHE</option></select>
+      <input id="regPass" type="password" placeholder="Create Password">
+      <button class="primary" id="btnRegOtp" onclick="sendRegOtp()">Send OTP</button>
+    </div>
+    <div id="regStep2" class="hidden"><p style="color:#86efac;font-size:13px;">OTP sent to email!</p><input id="regOtp" placeholder="Enter OTP"><button class="primary" id="btnRegFinal" onclick="doRegister()">Verify & Register</button></div>
+    <button class="link" onclick="setView('login')" style="margin-top:10px">Back</button>
+  </div>
+  <div id="viewForgot" class="hidden">
+    <h3>Reset Password</h3>
+    <div id="forgotStep1"><input id="forgotEmail" placeholder="Registered Email"><button class="primary" id="btnForgotOtp" onclick="sendForgotOtp()">Send OTP</button></div>
+    <div id="forgotStep2"><input id="forgotOtp" placeholder="Enter OTP"><input id="forgotNewPass" type="password" placeholder="New Password"><button class="primary" id="btnForgotFinal" onclick="doReset()">Reset Password</button></div>
+    <button class="link" onclick="setView('login')" style="margin-top:10px">Back</button>
+  </div>
+  <div id="msgBox" class="notice"></div>
+</div>
+
+<script>
+// =================================================================
+// PASTE YOUR URL HERE
+const API_URL = "https://script.google.com/macros/s/AKfycbzdqbNdHgOweAyZhCcSYiEBlnGmWiFj_xbkyIBwrxp5MyDyWTLb-kIZxcZO9wpu6FtsXQ/exec"; 
+// =================================================================
+
+function toggleLogin() { const isRoll = document.getElementById("loginMethod").value === "roll"; document.getElementById("loginRoll").classList.toggle("hidden", !isRoll); document.getElementById("loginEmail").classList.toggle("hidden", isRoll); }
+function setView(v) { ['viewLogin','viewReg','viewForgot'].forEach(id=>document.getElementById(id).classList.add('hidden')); document.getElementById('view'+v.charAt(0).toUpperCase()+v.slice(1)).classList.remove('hidden'); document.getElementById('msgBox').style.display='none'; }
+async function post(data, btnId) {
+  const btn = document.getElementById(btnId); const origText = btn.innerText;
+  btn.innerHTML = '<div class="loader"></div>'; btn.disabled = true; document.getElementById('msgBox').style.display='none';
+  try { const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(data) }); const json = await res.json(); btn.innerHTML = origText; btn.disabled = false; return json; } 
+  catch(e) { btn.innerHTML = origText; btn.disabled = false; showMsg("Connection Error", "err"); return { status: "error" }; }
+}
+function showMsg(txt, type) { const m = document.getElementById('msgBox'); m.innerText = txt; m.className = "notice " + type; m.style.display='block'; }
+
+async function doLogin() {
+  const method = document.getElementById('loginMethod').value;
+  const id = method==='roll' ? document.getElementById('loginRoll').value : document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPass').value;
+  
+  const r = await post({ type:"login", identifier:id, password:pass }, 'btnLogin');
+  if(r.status==="success") {
+    localStorage.setItem("userName", r.name);
+    localStorage.setItem("userRoll", r.roll);
+    localStorage.setItem("userBranch", r.branch);
+    
+    // NEW: Save the schedule if it exists on server
+    if(r.schedule) {
+      localStorage.setItem("mySchedule", r.schedule);
+    }
+    
+    window.location.href="index.html";
+  } else showMsg(r.message||"Login failed", "err");
+}
+
+async function sendRegOtp() {
+  const data = { type: "reg-send-otp", name: document.getElementById('regName').value, roll: document.getElementById('regRoll').value, email: document.getElementById('regEmail').value, branch: document.getElementById('regBranch').value, password: document.getElementById('regPass').value };
+  if(!data.branch) return showMsg("Please select a branch", "err");
+  const r = await post(data, 'btnRegOtp');
+  if(r.status==="otp_sent") { document.getElementById('regStep1').classList.add('hidden'); document.getElementById('regStep2').classList.remove('hidden'); } else showMsg(r.message, "err");
+}
+async function doRegister() { const r = await post({ type: "reg-complete", name: document.getElementById('regName').value, roll: document.getElementById('regRoll').value, email: document.getElementById('regEmail').value, branch: document.getElementById('regBranch').value, password: document.getElementById('regPass').value, otp: document.getElementById('regOtp').value }, 'btnRegFinal'); if(r.status==="success") { showMsg("Registered! Login now.", "ok"); setTimeout(()=>setView('login'), 2000); } else showMsg(r.message, "err"); }
+async function sendForgotOtp() { const r = await post({ type:"forgot-send-otp", email:document.getElementById('forgotEmail').value }, 'btnForgotOtp'); if(r.status==="otp_sent") { document.getElementById('forgotStep1').classList.add('hidden'); document.getElementById('forgotStep2').classList.remove('hidden'); } else showMsg(r.message, "err"); }
+async function doReset() { const r = await post({ type: "forgot-complete", email: document.getElementById('forgotEmail').value, otp: document.getElementById('forgotOtp').value, newPassword: document.getElementById('forgotNewPass').value }, 'btnForgotFinal'); if(r.status==="success") { showMsg("Password Reset!", "ok"); setTimeout(()=>setView('login'), 2000); } else showMsg(r.message, "err"); }
+</script>
+</body>
+</html>
