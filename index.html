@@ -13,7 +13,7 @@
   header { 
     background: rgba(15, 23, 42, 0.95); 
     padding: 0 40px; 
-    height: 80px; /* Fixed height for better alignment */
+    height: 80px; 
     border-bottom: 1px solid var(--border); 
     display: flex; 
     justify-content: space-between; 
@@ -47,7 +47,7 @@
   /* Right Side: Greeting + Controls */
   .right-area { display: flex; align-items: center; gap: 25px; }
   
-  /* Greeting Style - Now on the right */
+  /* Greeting Style */
   .greeting-box { text-align: right; }
   .greeting-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
   .user-name { font-family: 'Playfair Display', serif; font-size: 18px; color: white; font-weight: 700; }
@@ -205,10 +205,18 @@ const roll = localStorage.getItem("userRoll");
 const branch = localStorage.getItem("userBranch");
 const pass = localStorage.getItem("userPass");
 
-if(!user || !roll) window.location.href="login.html";
+// FIX: Stop execution immediately if no user found
+if(!user || !roll) {
+  window.location.href = "login.html";
+  throw new Error("User not logged in. Redirecting...");
+}
 
-// Set Greeting
-document.getElementById("dispName").innerText = user.split(" ")[0]; // Just first name
+// Set Greeting (Now safe because we know user exists)
+try {
+  document.getElementById("dispName").innerText = user.split(" ")[0]; 
+} catch(e) {
+  document.getElementById("dispName").innerText = "User";
+}
 
 document.getElementById("dateDisp").innerText = new Date().toLocaleDateString();
 let mySchedule = JSON.parse(localStorage.getItem("mySchedule")) || { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] };
