@@ -24,7 +24,6 @@
     backdrop-filter: blur(10px); 
   }
   
-  /* Left Side: Brand */
   .brand-group { display: flex; flex-direction: column; justify-content: center; }
   .brand { 
     font-family: 'Playfair Display', serif; 
@@ -44,25 +43,20 @@
     margin-top: 4px; 
   }
   
-  /* Right Side: Greeting + Controls */
   .right-area { display: flex; align-items: center; gap: 25px; }
   
-  /* Greeting Style */
   .greeting-box { text-align: right; }
   .greeting-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
   .user-name { font-family: 'Playfair Display', serif; font-size: 18px; color: white; font-weight: 700; }
 
-  /* Vertical Divider */
   .divider { height: 30px; width: 1px; background: var(--border); }
 
-  /* Buttons */
   .header-btn { background:rgba(59, 130, 246, 0.1); color:var(--accent); border:1px solid var(--accent); padding: 8px 16px; border-radius: 8px; font-weight: 600; transition: 0.2s; cursor: pointer; font-size: 13px; } 
   .header-btn:hover { background: var(--accent); color: white; }
   
   .settings-btn { background:transparent; border:1px solid #475569; color:#94a3b8; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition:0.2s; font-size: 13px; font-weight: 500; } 
   .settings-btn:hover { border-color:white; color:white; }
 
-  /* --- MENU & LAYOUT --- */
   .profile-menu { position:absolute; top:70px; right:20px; width:280px; background:#1e293b; border:1px solid var(--border); border-radius:16px; padding:20px; display:none; box-shadow:0 20px 50px rgba(0,0,0,0.5); z-index:100; backdrop-filter: blur(10px); }
   .profile-menu.show { display:block; animation: fadeIn 0.2s ease-out; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -101,7 +95,6 @@
   #toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:white; color:black; padding:12px 24px; border-radius:50px; font-weight:600; display:none; z-index:100; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
   #syncStatus { font-size:11px; margin-right:15px; color:#94a3b8; font-style:italic; display: flex; align-items: center; }
 
-  /* Mobile Responsive */
   @media (max-width: 768px) {
     header { height: auto; padding: 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
     .right-area { width: 100%; justify-content: space-between; }
@@ -120,10 +113,9 @@
   </div>
 
   <div class="right-area">
-    
     <div class="greeting-box">
       <div class="greeting-label">Welcome back</div>
-      <div class="user-name">Hi, <span id="dispName">User</span></div>
+      <div class="user-name">Hi, <span id="dispName">Guest</span></div>
     </div>
 
     <div class="divider"></div>
@@ -200,23 +192,19 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJpA1JfJcUGf4TJWGaSHHIt0kHTBqEPB3wsWsZKyYZFeA-QbtTFOafitA7wfDmxjCw9w/exec"; 
 // =================================================================
 
-const user = localStorage.getItem("userName");
+// SAFE VARIABLE RETRIEVAL: Use "Guest" if null to prevent crashes
+const user = localStorage.getItem("userName") || "Guest";
 const roll = localStorage.getItem("userRoll");
 const branch = localStorage.getItem("userBranch");
 const pass = localStorage.getItem("userPass");
 
-// FIX: Stop execution immediately if no user found
-if(!user || !roll) {
+// Security Check: If user isn't real, redirect, but don't crash.
+if(!roll) {
   window.location.href = "login.html";
-  throw new Error("User not logged in. Redirecting...");
 }
 
-// Set Greeting (Now safe because we know user exists)
-try {
-  document.getElementById("dispName").innerText = user.split(" ")[0]; 
-} catch(e) {
-  document.getElementById("dispName").innerText = "User";
-}
+// SAFE DISPLAY: Now 'user' is guaranteed to be a string (at least "Guest")
+document.getElementById("dispName").innerText = user.split(" ")[0]; 
 
 document.getElementById("dateDisp").innerText = new Date().toLocaleDateString();
 let mySchedule = JSON.parse(localStorage.getItem("mySchedule")) || { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] };
@@ -228,7 +216,6 @@ init();
 
 function init() {
   updateSubjectList(); renderSchedule(); renderWeekly(); fetchStats();
-  // Init Settings inputs
   document.getElementById("profBranch").value = branch || "";
   document.getElementById("profPass").value = pass || "";
 }
