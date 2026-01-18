@@ -9,7 +9,7 @@
   :root { --bg:#0f172a; --card:rgba(30, 41, 59, 0.7); --text:#f1f5f9; --accent:#3b82f6; --border:rgba(255,255,255,0.1); }
   body { margin:0; font-family:'Inter', system-ui; background:var(--bg); color:var(--text); min-height:100vh; }
   
-  /* --- REFINED HEADER --- */
+  /* --- HEADER --- */
   header { 
     background: rgba(15, 23, 42, 0.95); 
     padding: 0 40px; 
@@ -25,30 +25,13 @@
   }
   
   .brand-group { display: flex; flex-direction: column; justify-content: center; }
-  .brand { 
-    font-family: 'Playfair Display', serif; 
-    font-weight: 900; 
-    font-size: 24px; 
-    text-transform: uppercase; 
-    color: white; 
-    letter-spacing: 2px; 
-    line-height: 1;
-  }
-  .credit { 
-    font-size: 10px; 
-    color: #64748b; 
-    font-weight: 600; 
-    text-transform: uppercase; 
-    letter-spacing: 2px; 
-    margin-top: 4px; 
-  }
+  .brand { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 24px; text-transform: uppercase; color: white; letter-spacing: 2px; line-height: 1; }
+  .credit { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
   
   .right-area { display: flex; align-items: center; gap: 25px; }
-  
   .greeting-box { text-align: right; }
   .greeting-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
   .user-name { font-family: 'Playfair Display', serif; font-size: 18px; color: white; font-weight: 700; }
-
   .divider { height: 30px; width: 1px; background: var(--border); }
 
   .header-btn { background:rgba(59, 130, 246, 0.1); color:var(--accent); border:1px solid var(--accent); padding: 8px 16px; border-radius: 8px; font-weight: 600; transition: 0.2s; cursor: pointer; font-size: 13px; } 
@@ -57,6 +40,7 @@
   .settings-btn { background:transparent; border:1px solid #475569; color:#94a3b8; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition:0.2s; font-size: 13px; font-weight: 500; } 
   .settings-btn:hover { border-color:white; color:white; }
 
+  /* --- MENU --- */
   .profile-menu { position:absolute; top:70px; right:20px; width:280px; background:#1e293b; border:1px solid var(--border); border-radius:16px; padding:20px; display:none; box-shadow:0 20px 50px rgba(0,0,0,0.5); z-index:100; backdrop-filter: blur(10px); }
   .profile-menu.show { display:block; animation: fadeIn 0.2s ease-out; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -64,26 +48,43 @@
   .menu-label { font-size:12px; color:#94a3b8; margin-bottom:6px; display:block; font-weight: 600; }
   .menu-input { width:100%; padding:10px; background:rgba(15, 23, 42, 0.6); border:1px solid var(--border); color:white; border-radius:8px; font-size:13px; outline:none; transition: border-color 0.2s; }
   .menu-input:focus { border-color: var(--accent); }
-  
   .pass-group { display:flex; gap:5px; }
   .toggle-vis { background:none; border:none; color:#94a3b8; cursor:pointer; font-size:14px; padding: 0 5px; } .toggle-vis:hover { color: white; }
   
+  /* --- LAYOUT --- */
   .container { max-width:1200px; margin:20px auto; padding:0 15px; display:flex; gap:20px; flex-wrap:wrap; }
   .main { flex:3; min-width:300px; }
   .sidebar { flex:1; min-width:280px; }
   .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:25px; margin-bottom:20px; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
   h2, h3 { margin-top:0; color:white; font-family: 'Playfair Display', serif; letter-spacing: 0.5px; } h2 { font-size: 22px; } h3 { font-size: 18px; color: var(--accent); }
   
+  /* --- STATS & LISTS --- */
   .stat-row { margin-bottom:15px; } .stat-head { display:flex; justify-content:space-between; font-size:14px; margin-bottom:6px; font-weight: 500; } .progress-bg { background:rgba(255,255,255,0.1); height:10px; border-radius:5px; overflow:hidden; } .progress-fill { height:100%; transition:width 0.5s ease; border-radius:5px; }
   .p-green { background:#22c55e; } .p-orange { background:#f59e0b; } .p-red { background:#ef4444; }
   .week-row { display:flex; border-bottom:1px solid var(--border); padding:12px 0; align-items:center; } .week-row:last-child { border-bottom:none; } .week-day { width:100px; font-weight:600; color:#94a3b8; font-size:14px; } .week-subjects { flex:1; display:flex; flex-wrap:wrap; gap:8px; }
   .sub-tag { background:#334155; padding:4px 10px; border-radius:15px; font-size:12px; border:1px solid var(--border); font-weight: 500; } .sub-tag.long { border-color:#3b82f6; color:#bfdbfe; }
-  .subject-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:15px; margin-top:20px; }
+  
+  /* --- SCHEDULE BUTTONS (Compact P B A C R) --- */
+  .subject-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px; margin-top:20px; }
   .sub-btn { background:#1e293b; color:white; padding:15px; border:1px solid var(--border); border-radius:12px; display:flex; flex-direction:column; gap:10px; min-height:100px; transition:0.2s; position:relative; overflow:hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } .sub-btn:hover { background:#334155; border-color:var(--accent); transform: translateY(-2px); }
-  .sub-btn.long { grid-column: span 2; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border:1px solid #3b82f6; } .sub-btn.long::after { content:"2 HR"; position:absolute; top:10px; right:40px; font-size:10px; background:#3b82f6; padding:3px 6px; border-radius:4px; font-weight:700; letter-spacing: 0.5px; }
-  .card-top { display:flex; justify-content:space-between; align-items:start; width:100%; } .reorder-controls { display:flex; gap:2px; } .move-btn { background:rgba(0,0,0,0.3); color:#94a3b8; padding:4px 8px; font-size:10px; border:1px solid var(--border); border-radius:6px; cursor:pointer; height:fit-content; transition: 0.2s; } .move-btn:hover { background:white; color:black; border-color: white; }
-  .actions { display:flex; gap:6px; margin-top:auto; } .act-btn { flex:1; padding:8px; font-size:12px; border-radius:8px; border:none; color:white; font-weight:600; cursor: pointer; transition: 0.2s; } .act-btn:hover { opacity: 0.9; transform: scale(1.02); }
+  .sub-btn.long { grid-column: span 1; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border:1px solid #3b82f6; } .sub-btn.long::after { content:"2 HR"; position:absolute; top:10px; right:10px; font-size:10px; background:#3b82f6; padding:3px 6px; border-radius:4px; font-weight:700; letter-spacing: 0.5px; }
+  
+  .card-top { display:flex; justify-content:space-between; align-items:center; width:100%; } 
+  .reorder-controls { display:flex; gap:2px; } 
+  .move-btn { background:rgba(0,0,0,0.3); color:#94a3b8; padding:4px 8px; font-size:10px; border:1px solid var(--border); border-radius:6px; cursor:pointer; height:fit-content; transition: 0.2s; } .move-btn:hover { background:white; color:black; border-color: white; }
+  
+  .actions { display:flex; gap:6px; margin-top:auto; } 
+  .act-btn { flex:1; padding:8px 0; font-size:12px; border-radius:8px; border:none; color:white; font-weight:600; cursor: pointer; transition: 0.2s; text-transform: uppercase; } 
+  .act-btn:hover { opacity: 0.9; transform: scale(1.05); }
+  
   .bg-green { background:#16a34a; } .bg-red { background:#dc2626; } .bg-orange { background:#ea580c; } .bg-blue { background:#2563eb; } .bg-purple { background:#9333ea; }
+  
+  /* --- LEGEND --- */
+  .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #cbd5e1; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+
+  /* --- FORMS --- */
   .editor-box { background:#1e293b; padding:20px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px; } .hidden { display:none; }
   .reschedule-box { background:rgba(147, 51, 234, 0.15); border:1px solid rgba(147, 51, 234, 0.4); padding:15px; border-radius:10px; margin-top:15px; }
   label { display:block; font-size:12px; color:#94a3b8; margin:12px 0 6px; font-weight: 600; }
@@ -100,6 +101,7 @@
     .right-area { width: 100%; justify-content: space-between; }
     .greeting-box { text-align: left; }
     .divider { display: none; }
+    .subject-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -158,12 +160,26 @@
       </div>
       <button onclick="clearSchedule()" style="color:#ef4444; background:none; border:1px solid #ef4444; width:auto; padding:8px 12px; border-radius: 8px;">Reset All Data</button>
     </div>
+    
     <div class="card">
       <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h2 id="dayHeader" style="margin:0; font-family:'Inter', sans-serif; font-size: 20px;">Today</h2><span style="font-size:12px;color:#94a3b8; font-weight: 600;" id="dateDisp"></span></div>
       <div id="subjectList" class="subject-grid"></div>
       <div id="emptyMsg" style="text-align:center; padding:40px; display:none; color:#94a3b8">No classes today.</div>
     </div>
+    
+    <div class="card">
+      <h3 style="font-size:14px; margin-bottom:15px;">Attendance Key</h3>
+      <div class="legend-grid">
+        <div class="legend-item"><div class="legend-dot bg-green"></div> <span>P - Present</span></div>
+        <div class="legend-item"><div class="legend-dot bg-red"></div> <span>B - Bunked</span></div>
+        <div class="legend-item"><div class="legend-dot bg-orange"></div> <span>A - Absent</span></div>
+        <div class="legend-item"><div class="legend-dot bg-blue"></div> <span>C - Cancelled</span></div>
+        <div class="legend-item"><div class="legend-dot bg-purple"></div> <span>R - Rescheduled</span></div>
+      </div>
+    </div>
+
     <div class="card"><h3>Weekly Schedule</h3><div id="weeklyContainer"></div></div>
+
   </div>
   <div class="sidebar">
     <div class="card">
@@ -192,21 +208,16 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJpA1JfJcUGf4TJWGaSHHIt0kHTBqEPB3wsWsZKyYZFeA-QbtTFOafitA7wfDmxjCw9w/exec"; 
 // =================================================================
 
-// SAFE VARIABLE RETRIEVAL: Use "Guest" if null to prevent crashes
 const user = localStorage.getItem("userName") || "Guest";
 const roll = localStorage.getItem("userRoll");
 const branch = localStorage.getItem("userBranch");
 const pass = localStorage.getItem("userPass");
 
-// Security Check: If user isn't real, redirect, but don't crash.
-if(!roll) {
-  window.location.href = "login.html";
-}
+if(!roll) { window.location.href = "login.html"; }
 
-// SAFE DISPLAY: Now 'user' is guaranteed to be a string (at least "Guest")
 document.getElementById("dispName").innerText = user.split(" ")[0]; 
-
 document.getElementById("dateDisp").innerText = new Date().toLocaleDateString();
+
 let mySchedule = JSON.parse(localStorage.getItem("mySchedule")) || { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] };
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const today = days[new Date().getDay()];
@@ -227,40 +238,45 @@ async function updateProfile() {
   const newBranch = document.getElementById("profBranch").value;
   const newPass = document.getElementById("profPass").value;
   const btn = document.querySelector(".btn-save");
-  
-  btn.innerText = "Updating...";
-  btn.disabled = true;
-
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      type: "update-profile",
-      roll: roll,
-      branch: newBranch,
-      password: newPass
-    })
-  })
-  .then(r => r.json())
-  .then(res => {
-    if(res.status === "success") {
-      localStorage.setItem("userBranch", newBranch);
-      localStorage.setItem("userPass", newPass);
-      alert("Details Updated!");
-      location.reload();
-    } else {
-      alert("Error: " + res.message);
-    }
+  btn.innerText = "Updating..."; btn.disabled = true;
+  fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ type: "update-profile", roll: roll, branch: newBranch, password: newPass }) })
+  .then(r => r.json()).then(res => {
+    if(res.status === "success") { localStorage.setItem("userBranch", newBranch); localStorage.setItem("userPass", newPass); alert("Details Updated!"); location.reload(); } else { alert("Error: " + res.message); }
     btn.innerText = "Update Details"; btn.disabled = false;
-  })
-  .catch(e => {
-     alert("Connection Error.");
-     btn.innerText = "Update Details"; btn.disabled = false;
-  });
+  }).catch(e => { alert("Connection Error."); btn.innerText = "Update Details"; btn.disabled = false; });
 }
 
 function syncSchedule() { document.getElementById("syncStatus").innerHTML = "<span>Syncing...</span>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ type: "save-schedule", roll: roll, schedule: JSON.stringify(mySchedule) }) }).then(r=>r.json()).then(res=>{ document.getElementById("syncStatus").innerHTML = res.status==="success" ? "<span style='color:#86efac'>Saved ✔</span>" : "<span style='color:#fca5a5'>Error ⚠</span>"; }); }
 async function sendData(day, subject, status, remark, weight, dateOverride) { const toast = document.getElementById("toast"); toast.innerText = "Saving..."; toast.style.display = "block"; try { const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ name: user, roll: roll, date: dateOverride ? new Date(dateOverride).toLocaleDateString() : new Date().toLocaleDateString(), day: day, subject: subject, status: status, remark: remark, weight: parseInt(weight) }) }); const data = await res.json(); if(data.status === "success") { toast.innerText = "Saved!"; await fetchStats(); setTimeout(() => toast.style.display="none", 2000); } else throw new Error(data.message); } catch(e) { toast.innerText = "Error!"; setTimeout(() => toast.style.display="none", 3000); } }
-function renderSchedule() { const container = document.getElementById("subjectList"); container.innerHTML = ""; const subjects = mySchedule[today] || []; if(subjects.length === 0) { document.getElementById("emptyMsg").style.display = "block"; } else { document.getElementById("emptyMsg").style.display = "none"; subjects.forEach((sub, index) => { const cls = sub.duration == 2 ? "sub-btn long" : "sub-btn"; const showUp = index > 0 ? `<button class="move-btn" onclick="moveSubject(${index}, -1)">▲</button>` : ''; const showDown = index < subjects.length - 1 ? `<button class="move-btn" onclick="moveSubject(${index}, 1)">▼</button>` : ''; const html = `<div class="${cls}"><div class="card-top"><div style="font-weight:bold;font-size:15px;">${sub.name}</div><div class="reorder-controls">${showUp}${showDown}</div></div><div class="actions"><button class="act-btn bg-green" onclick="mark('${sub.name}','Attended',${sub.duration})">P</button><button class="act-btn bg-red" onclick="mark('${sub.name}','Bunked',${sub.duration})">B</button><button class="act-btn bg-orange" onclick="mark('${sub.name}','Absent',${sub.duration})">A</button><button class="act-btn bg-blue" onclick="mark('${sub.name}','Cancelled',0)">C</button><button class="act-btn bg-purple" onclick="mark('${sub.name}','Rescheduled',${sub.duration},'Rescheduled')">R</button></div></div>`; container.innerHTML += html; }); } }
+
+// REVERTED: Buttons are back to single letters P, B, A, C, R
+function renderSchedule() { 
+  const container = document.getElementById("subjectList"); container.innerHTML = ""; 
+  const subjects = mySchedule[today] || []; 
+  if(subjects.length === 0) { document.getElementById("emptyMsg").style.display = "block"; } else { document.getElementById("emptyMsg").style.display = "none"; 
+    subjects.forEach((sub, index) => { 
+      const cls = sub.duration == 2 ? "sub-btn long" : "sub-btn"; 
+      const showUp = index > 0 ? `<button class="move-btn" onclick="moveSubject(${index}, -1)">▲</button>` : ''; 
+      const showDown = index < subjects.length - 1 ? `<button class="move-btn" onclick="moveSubject(${index}, 1)">▼</button>` : ''; 
+      const html = `
+        <div class="${cls}">
+          <div class="card-top">
+            <div style="font-weight:bold;font-size:15px;">${sub.name}</div>
+            <div class="reorder-controls">${showUp}${showDown}</div>
+          </div>
+          <div class="actions">
+            <button class="act-btn bg-green" onclick="mark('${sub.name}','Attended',${sub.duration})">P</button>
+            <button class="act-btn bg-red" onclick="mark('${sub.name}','Bunked',${sub.duration})">B</button>
+            <button class="act-btn bg-orange" onclick="mark('${sub.name}','Absent',${sub.duration})">A</button>
+            <button class="act-btn bg-blue" onclick="mark('${sub.name}','Cancelled',0)">C</button>
+            <button class="act-btn bg-purple" onclick="mark('${sub.name}','Rescheduled',${sub.duration},'Rescheduled')">R</button>
+          </div>
+        </div>`; 
+      container.innerHTML += html; 
+    }); 
+  } 
+}
+
 function renderWeekly() { const container = document.getElementById("weeklyContainer"); container.innerHTML = ""; ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].forEach(day => { const subjects = mySchedule[day] || []; let subHtml = subjects.length === 0 ? `<span style="font-size:12px;color:#64748b;font-style:italic;">No classes</span>` : subjects.map(s => `<span class="${s.duration==2?'sub-tag long':'sub-tag'}">${s.name}</span>`).join(""); container.innerHTML += `<div class="week-row"><div class="week-day">${day}</div><div class="week-subjects">${subHtml}</div></div>`; }); }
 async function fetchStats() { try { const res = await fetch(`${SCRIPT_URL}?type=history&roll=${encodeURIComponent(roll)}`); const history = await res.json(); const stats = {}; history.forEach(entry => { const sub = entry.subject; const weight = parseInt(entry.weight) || 1; if (!stats[sub]) stats[sub] = { attended: 0, total: 0 }; if (entry.status === "Attended") { stats[sub].attended += weight; stats[sub].total += weight; } else if (entry.status === "Absent" || entry.status === "Bunked") { stats[sub].total += weight; } }); renderStats(stats); } catch (e) { document.getElementById("statsContainer").innerHTML = '<div style="text-align:center;font-size:12px;color:#ef4444">Failed to load stats</div>'; } }
 function renderStats(stats) { const container = document.getElementById("statsContainer"); container.innerHTML = ""; if (Object.keys(stats).length === 0) { container.innerHTML = '<div style="text-align:center;font-size:12px;color:#64748b">No data yet</div>'; return; } for (const [sub, data] of Object.entries(stats)) { if (data.total === 0) continue; const pct = Math.round((data.attended / data.total) * 100); let color = pct >= 75 ? "p-green" : (pct >= 50 ? "p-orange" : "p-red"); container.innerHTML += `<div class="stat-row"><div class="stat-head"><span>${sub}</span><span>${pct}% <span style="opacity:0.5;font-size:11px;">(${data.attended}/${data.total}) pts</span></span></div><div class="progress-bg"><div class="progress-fill ${color}" style="width:${pct}%"></div></div></div>`; } }
