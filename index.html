@@ -10,20 +10,7 @@
   body { margin:0; font-family:'Inter', system-ui; background:var(--bg); color:var(--text); min-height:100vh; }
   
   /* --- HEADER --- */
-  header { 
-    background: rgba(15, 23, 42, 0.95); 
-    padding: 0 40px; 
-    height: 80px; 
-    border-bottom: 1px solid var(--border); 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    position: sticky; 
-    top: 0; 
-    z-index: 50; 
-    backdrop-filter: blur(10px); 
-  }
-  
+  header { background: rgba(15, 23, 42, 0.95); padding: 0 40px; height: 80px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(10px); }
   .brand-group { display: flex; flex-direction: column; justify-content: center; }
   .brand { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 24px; text-transform: uppercase; color: white; letter-spacing: 2px; line-height: 1; }
   .credit { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
@@ -39,6 +26,13 @@
   
   .settings-btn { background:transparent; border:1px solid #475569; color:#94a3b8; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition:0.2s; font-size: 13px; font-weight: 500; } 
   .settings-btn:hover { border-color:white; color:white; }
+
+  /* Semester Dropdown Styling */
+  .semester-control { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid #475569; border-radius: 8px; overflow: hidden; height: 35px; }
+  .semester-control select { background: transparent; border: none; padding: 0 12px; color: white; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; height: 100%; -webkit-appearance: none; appearance: none; }
+  .semester-control select option { background: #1e293b; color: white; }
+  .semester-control button { background: #334155; border: none; border-left: 1px solid #475569; color: white; padding: 0 12px; cursor: pointer; font-weight: bold; transition: 0.2s; height: 100%; display: flex; align-items: center; }
+  .semester-control button:hover { background: var(--accent); }
 
   /* --- MENU --- */
   .profile-menu { position:absolute; top:70px; right:20px; width:280px; background:#1e293b; border:1px solid var(--border); border-radius:16px; padding:20px; display:none; box-shadow:0 20px 50px rgba(0,0,0,0.5); z-index:100; backdrop-filter: blur(10px); }
@@ -64,7 +58,7 @@
   .week-row { display:flex; border-bottom:1px solid var(--border); padding:12px 0; align-items:center; } .week-row:last-child { border-bottom:none; } .week-day { width:100px; font-weight:600; color:#94a3b8; font-size:14px; } .week-subjects { flex:1; display:flex; flex-wrap:wrap; gap:8px; }
   .sub-tag { background:#334155; padding:4px 10px; border-radius:15px; font-size:12px; border:1px solid var(--border); font-weight: 500; } .sub-tag.long { border-color:#3b82f6; color:#bfdbfe; }
   
-  /* --- SCHEDULE BUTTONS (Updated to 6 Buttons) --- */
+  /* --- SCHEDULE BUTTONS --- */
   .subject-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px; margin-top:20px; }
   .sub-btn { background:#1e293b; color:white; padding:15px; border:1px solid var(--border); border-radius:12px; display:flex; flex-direction:column; gap:10px; min-height:100px; transition:0.2s; position:relative; overflow:hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } .sub-btn:hover { background:#334155; border-color:var(--accent); transform: translateY(-2px); }
   .sub-btn.long { grid-column: span 1; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border:1px solid #3b82f6; } .sub-btn.long::after { content:"2 HR"; position:absolute; top:10px; right:10px; font-size:10px; background:#3b82f6; padding:3px 6px; border-radius:4px; font-weight:700; letter-spacing: 0.5px; }
@@ -99,7 +93,7 @@
 
   @media (max-width: 768px) {
     header { height: auto; padding: 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
-    .right-area { width: 100%; justify-content: space-between; }
+    .right-area { width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 15px;}
     .greeting-box { text-align: left; }
     .divider { display: none; }
     .subject-grid { grid-template-columns: 1fr; }
@@ -124,6 +118,12 @@
     <div class="divider"></div>
 
     <div style="display:flex; align-items:center; gap:10px">
+      
+      <div class="semester-control">
+        <select id="semesterSelect" onchange="changeSemester()"></select>
+        <button onclick="createNewSemester()" title="Add New Semester">+</button>
+      </div>
+
       <span id="syncStatus"></span>
       <button onclick="toggleEditor()" class="header-btn">✎ Schedule</button>
       <button onclick="toggleProfile()" class="settings-btn">⚙ Settings</button>
@@ -150,7 +150,12 @@
 
 <div class="container">
   <div class="main">
-    <div class="card"><h3>Attendance Statistics</h3><p style="font-size:12px;color:#94a3b8;margin-bottom:15px;">Weighted: 1hr = 1pt, 2hr = 2pts.</p><div id="statsContainer"><div style="text-align:center;padding:10px;color:#64748b;">Loading stats...</div></div></div>
+    <div class="card">
+      <h3>Attendance Statistics</h3>
+      <p style="font-size:12px;color:#94a3b8;margin-bottom:15px;">Weighted: 1hr = 1pt, 2hr = 2pts. Showing data for <span id="statSemLabel" style="color:white; font-weight:bold;">Semester 2</span>.</p>
+      <div id="statsContainer"><div style="text-align:center;padding:10px;color:#64748b;">Loading stats...</div></div>
+    </div>
+    
     <div id="editor" class="card hidden">
       <h3>Manage Subjects</h3>
       <div class="editor-box">
@@ -159,7 +164,7 @@
         <label>Duration</label><select id="edDur"><option value="1">1 Hour</option><option value="2">2 Hours</option></select>
         <button class="btn-full" onclick="addSubject()" style="background:linear-gradient(to right, #16a34a, #059669); color:white;">+ Add to Schedule</button>
       </div>
-      <button onclick="clearSchedule()" style="color:#ef4444; background:none; border:1px solid #ef4444; width:auto; padding:8px 12px; border-radius: 8px;">Reset All Data</button>
+      <button onclick="clearSchedule()" style="color:#ef4444; background:none; border:1px solid #ef4444; width:auto; padding:8px 12px; border-radius: 8px;">Reset Current Semester</button>
     </div>
     
     <div class="card">
@@ -207,7 +212,7 @@
 <script>
 // =================================================================
 // REPLACE WITH YOUR URL
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJpA1JfJcUGf4TJWGaSHHIt0kHTBqEPB3wsWsZKyYZFeA-QbtTFOafitA7wfDmxjCw9w/exec"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFpzOMDOgCxZXuC7HKiWRnywh-rGy6-RNpSxiakSdz_DrOi8etbwQnN4VdmGO8IjEViw/exec"; 
 // =================================================================
 
 const user = localStorage.getItem("userName") || "Guest";
@@ -216,19 +221,79 @@ const branch = localStorage.getItem("userBranch");
 const pass = localStorage.getItem("userPass");
 
 if(!roll) { window.location.href = "login.html"; }
-
 document.getElementById("dispName").innerText = user.split(" ")[0]; 
 document.getElementById("dateDisp").innerText = new Date().toLocaleDateString();
 
-let mySchedule = JSON.parse(localStorage.getItem("mySchedule")) || { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] };
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const today = days[new Date().getDay()];
 document.getElementById("dayHeader").innerText = today;
 
+// --- MIGRATION & SEMESTER LOGIC ---
+// Fixed default to Semester 2
+let semesters = { "Semester 2": { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] } };
+let currentSemester = "Semester 2";
+
+function loadSemesters() {
+  const rawSchedule = localStorage.getItem("mySchedule");
+  if(rawSchedule) {
+    try {
+      let parsed = JSON.parse(rawSchedule);
+      if(parsed.Monday) { 
+        semesters = { "Semester 2": parsed }; // Migrate old flat schedule to Semester 2
+        localStorage.setItem("mySchedule", JSON.stringify(semesters));
+      } else {
+        semesters = parsed; // Already migrated
+      }
+    } catch(e) {}
+  }
+  
+  let savedSem = localStorage.getItem("currentSemester");
+  if(savedSem && semesters[savedSem]) {
+    currentSemester = savedSem;
+  } else {
+    currentSemester = Object.keys(semesters)[0] || "Semester 2";
+    localStorage.setItem("currentSemester", currentSemester);
+  }
+  document.getElementById("statSemLabel").innerText = currentSemester;
+}
+
+function updateSemesterDropdown() {
+  const select = document.getElementById("semesterSelect");
+  select.innerHTML = "";
+  Object.keys(semesters).forEach(sem => {
+    const opt = document.createElement("option");
+    opt.value = sem; opt.innerText = sem;
+    if(sem === currentSemester) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+function changeSemester() {
+  currentSemester = document.getElementById("semesterSelect").value;
+  localStorage.setItem("currentSemester", currentSemester);
+  document.getElementById("statSemLabel").innerText = currentSemester;
+  init(); 
+}
+
+function createNewSemester() {
+  const name = prompt("Enter new semester name (e.g. Semester 3):");
+  if(name && !semesters[name]) {
+    semesters[name] = { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] };
+    currentSemester = name;
+    localStorage.setItem("currentSemester", currentSemester);
+    localStorage.setItem("mySchedule", JSON.stringify(semesters));
+    syncSchedule(); updateSemesterDropdown(); init();
+  } else if(semesters[name]) {
+    alert("Semester already exists!");
+  }
+}
+// ----------------------------------
+
+loadSemesters();
 init();
 
 function init() {
-  updateSubjectList(); renderSchedule(); renderWeekly(); fetchStats();
+  updateSemesterDropdown(); updateSubjectList(); renderSchedule(); renderWeekly(); fetchStats();
   document.getElementById("profBranch").value = branch || "";
   document.getElementById("profPass").value = pass || "";
 }
@@ -248,13 +313,23 @@ async function updateProfile() {
   }).catch(e => { alert("Connection Error."); btn.innerText = "Update Details"; btn.disabled = false; });
 }
 
-function syncSchedule() { document.getElementById("syncStatus").innerHTML = "<span>Syncing...</span>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ type: "save-schedule", roll: roll, schedule: JSON.stringify(mySchedule) }) }).then(r=>r.json()).then(res=>{ document.getElementById("syncStatus").innerHTML = res.status==="success" ? "<span style='color:#86efac'>Saved ✔</span>" : "<span style='color:#fca5a5'>Error ⚠</span>"; }); }
-async function sendData(day, subject, status, remark, weight, dateOverride) { const toast = document.getElementById("toast"); toast.innerText = "Saving..."; toast.style.display = "block"; try { const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ name: user, roll: roll, date: dateOverride ? new Date(dateOverride).toLocaleDateString() : new Date().toLocaleDateString(), day: day, subject: subject, status: status, remark: remark, weight: parseInt(weight) }) }); const data = await res.json(); if(data.status === "success") { toast.innerText = "Saved!"; await fetchStats(); setTimeout(() => toast.style.display="none", 2000); } else throw new Error(data.message); } catch(e) { toast.innerText = "Error!"; setTimeout(() => toast.style.display="none", 3000); } }
+function syncSchedule() { document.getElementById("syncStatus").innerHTML = "<span>Syncing...</span>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ type: "save-schedule", roll: roll, schedule: JSON.stringify(semesters) }) }).then(r=>r.json()).then(res=>{ document.getElementById("syncStatus").innerHTML = res.status==="success" ? "<span style='color:#86efac'>Saved ✔</span>" : "<span style='color:#fca5a5'>Error ⚠</span>"; }); }
 
-// UPDATED: Buttons now use Initials (P, B, A, CT, CR, R) mapping to full statuses
+async function sendData(day, subject, status, remark, weight, dateOverride) { 
+  const toast = document.getElementById("toast"); toast.innerText = "Saving..."; toast.style.display = "block"; 
+  try { 
+    const res = await fetch(SCRIPT_URL, { 
+      method: "POST", 
+      body: JSON.stringify({ name: user, roll: roll, date: dateOverride ? new Date(dateOverride).toLocaleDateString() : new Date().toLocaleDateString(), day: day, subject: subject, status: status, remark: remark, weight: parseInt(weight), semester: currentSemester }) 
+    }); 
+    const data = await res.json(); 
+    if(data.status === "success") { toast.innerText = "Saved!"; await fetchStats(); setTimeout(() => toast.style.display="none", 2000); } else throw new Error(data.message); 
+  } catch(e) { toast.innerText = "Error!"; setTimeout(() => toast.style.display="none", 3000); } 
+}
+
 function renderSchedule() { 
   const container = document.getElementById("subjectList"); container.innerHTML = ""; 
-  const subjects = mySchedule[today] || []; 
+  const subjects = semesters[currentSemester][today] || []; 
   if(subjects.length === 0) { document.getElementById("emptyMsg").style.display = "block"; } else { document.getElementById("emptyMsg").style.display = "none"; 
     subjects.forEach((sub, index) => { 
       const cls = sub.duration == 2 ? "sub-btn long" : "sub-btn"; 
@@ -280,15 +355,35 @@ function renderSchedule() {
   } 
 }
 
-function renderWeekly() { const container = document.getElementById("weeklyContainer"); container.innerHTML = ""; ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].forEach(day => { const subjects = mySchedule[day] || []; let subHtml = subjects.length === 0 ? `<span style="font-size:12px;color:#64748b;font-style:italic;">No classes</span>` : subjects.map(s => `<span class="${s.duration==2?'sub-tag long':'sub-tag'}">${s.name}</span>`).join(""); container.innerHTML += `<div class="week-row"><div class="week-day">${day}</div><div class="week-subjects">${subHtml}</div></div>`; }); }
-async function fetchStats() { try { const res = await fetch(`${SCRIPT_URL}?type=history&roll=${encodeURIComponent(roll)}`); const history = await res.json(); const stats = {}; history.forEach(entry => { const sub = entry.subject; const weight = parseInt(entry.weight) || 1; if (!stats[sub]) stats[sub] = { attended: 0, total: 0 }; if (entry.status === "Attended") { stats[sub].attended += weight; stats[sub].total += weight; } else if (entry.status === "Absent" || entry.status === "Bunked") { stats[sub].total += weight; } }); renderStats(stats); } catch (e) { document.getElementById("statsContainer").innerHTML = '<div style="text-align:center;font-size:12px;color:#ef4444">Failed to load stats</div>'; } }
-function renderStats(stats) { const container = document.getElementById("statsContainer"); container.innerHTML = ""; if (Object.keys(stats).length === 0) { container.innerHTML = '<div style="text-align:center;font-size:12px;color:#64748b">No data yet</div>'; return; } for (const [sub, data] of Object.entries(stats)) { if (data.total === 0) continue; const pct = Math.round((data.attended / data.total) * 100); let color = pct >= 75 ? "p-green" : (pct >= 50 ? "p-orange" : "p-red"); container.innerHTML += `<div class="stat-row"><div class="stat-head"><span>${sub}</span><span>${pct}% <span style="opacity:0.5;font-size:11px;">(${data.attended}/${data.total}) pts</span></span></div><div class="progress-bg"><div class="progress-fill ${color}" style="width:${pct}%"></div></div></div>`; } }
-function updateSubjectList() { const set = new Set(); Object.values(mySchedule).forEach(arr => arr.forEach(s => set.add(s.name))); const datalist = document.getElementById("mySubjects"); datalist.innerHTML = ""; set.forEach(name => { const opt = document.createElement("option"); opt.value = name; datalist.appendChild(opt); }); }
-function moveSubject(index, direction) { const dayList = mySchedule[today]; if (!dayList) return; [dayList[index], dayList[index + direction]] = [dayList[index + direction], dayList[index]]; localStorage.setItem("mySchedule", JSON.stringify(mySchedule)); syncSchedule(); renderSchedule(); renderWeekly(); }
+function renderWeekly() { const container = document.getElementById("weeklyContainer"); container.innerHTML = ""; ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].forEach(day => { const subjects = semesters[currentSemester][day] || []; let subHtml = subjects.length === 0 ? `<span style="font-size:12px;color:#64748b;font-style:italic;">No classes</span>` : subjects.map(s => `<span class="${s.duration==2?'sub-tag long':'sub-tag'}">${s.name}</span>`).join(""); container.innerHTML += `<div class="week-row"><div class="week-day">${day}</div><div class="week-subjects">${subHtml}</div></div>`; }); }
+
+async function fetchStats() { 
+  try { 
+    const res = await fetch(`${SCRIPT_URL}?type=history&roll=${encodeURIComponent(roll)}`); 
+    const history = await res.json(); 
+    const stats = {}; 
+    history.forEach(entry => { 
+      // Filter stats by current active semester
+      const entrySem = entry.semester || "Semester 2";
+      if(entrySem !== currentSemester) return;
+
+      const sub = entry.subject; 
+      const weight = parseInt(entry.weight) || 1; 
+      if (!stats[sub]) stats[sub] = { attended: 0, total: 0 }; 
+      if (entry.status === "Attended") { stats[sub].attended += weight; stats[sub].total += weight; } 
+      else if (entry.status === "Absent" || entry.status === "Bunked") { stats[sub].total += weight; } 
+    }); 
+    renderStats(stats); 
+  } catch (e) { document.getElementById("statsContainer").innerHTML = '<div style="text-align:center;font-size:12px;color:#ef4444">Failed to load stats</div>'; } 
+}
+
+function renderStats(stats) { const container = document.getElementById("statsContainer"); container.innerHTML = ""; if (Object.keys(stats).length === 0) { container.innerHTML = '<div style="text-align:center;font-size:12px;color:#64748b">No data yet for this semester</div>'; return; } for (const [sub, data] of Object.entries(stats)) { if (data.total === 0) continue; const pct = Math.round((data.attended / data.total) * 100); let color = pct >= 75 ? "p-green" : (pct >= 50 ? "p-orange" : "p-red"); container.innerHTML += `<div class="stat-row"><div class="stat-head"><span>${sub}</span><span>${pct}% <span style="opacity:0.5;font-size:11px;">(${data.attended}/${data.total}) pts</span></span></div><div class="progress-bg"><div class="progress-fill ${color}" style="width:${pct}%"></div></div></div>`; } }
+function updateSubjectList() { const set = new Set(); Object.values(semesters[currentSemester]).forEach(arr => arr.forEach(s => set.add(s.name))); const datalist = document.getElementById("mySubjects"); datalist.innerHTML = ""; set.forEach(name => { const opt = document.createElement("option"); opt.value = name; datalist.appendChild(opt); }); }
+function moveSubject(index, direction) { const dayList = semesters[currentSemester][today]; if (!dayList) return; [dayList[index], dayList[index + direction]] = [dayList[index + direction], dayList[index]]; localStorage.setItem("mySchedule", JSON.stringify(semesters)); syncSchedule(); renderSchedule(); renderWeekly(); }
 function toggleEditor() { document.getElementById("editor").classList.toggle("hidden"); }
 function toggleRescheduleBox() { const status = document.getElementById("mStatus").value; document.getElementById("rescheduleBox").classList.toggle("hidden", status !== "Rescheduled"); }
-function addSubject() { const day = document.getElementById("edDay").value; const name = document.getElementById("edName").value.trim(); const dur = document.getElementById("edDur").value; if(!name) return alert("Enter subject name"); mySchedule[day].push({ name: name, duration: parseInt(dur) }); localStorage.setItem("mySchedule", JSON.stringify(mySchedule)); syncSchedule(); updateSubjectList(); renderWeekly(); if(day === today) renderSchedule(); }
-function clearSchedule() { if(confirm("Delete all subjects?")) { localStorage.removeItem("mySchedule"); mySchedule = { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] }; syncSchedule(); location.reload(); } }
+function addSubject() { const day = document.getElementById("edDay").value; const name = document.getElementById("edName").value.trim(); const dur = document.getElementById("edDur").value; if(!name) return alert("Enter subject name"); semesters[currentSemester][day].push({ name: name, duration: parseInt(dur) }); localStorage.setItem("mySchedule", JSON.stringify(semesters)); syncSchedule(); updateSubjectList(); renderWeekly(); if(day === today) renderSchedule(); }
+function clearSchedule() { if(confirm(`Delete all subjects for ${currentSemester}?`)) { semesters[currentSemester] = { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] }; localStorage.setItem("mySchedule", JSON.stringify(semesters)); syncSchedule(); location.reload(); } }
 function mark(subject, status, weight, remark="") { sendData(today, subject, status, remark, weight); }
 function manual() { const d = document.getElementById("mDate").value; if(!d) return alert("Select date"); const sub = document.getElementById("mSubject").value; if(!sub) return alert("Enter subject"); const weight = document.getElementById("mWeight").value; const status = document.getElementById("mStatus").value; let rem = document.getElementById("mRemark").value; if(status === "Rescheduled") { const rDate = document.getElementById("rDate").value; const rTime = document.getElementById("rTime").value; if(rDate) rem += ` (To: ${rDate} ${rTime})`; } const btn = document.querySelector(".sidebar .btn-full"); const oldText = btn.innerText; btn.innerText = "Processing..."; btn.disabled = true; sendData(document.getElementById("mDay").value, sub, status, rem, weight, d).then(() => { btn.innerText = oldText; btn.disabled = false; document.getElementById("mSubject").value = ""; document.getElementById("mRemark").value = ""; }); }
 function exportMyData() { window.open(`${SCRIPT_URL}?roll=${encodeURIComponent(roll)}`, "_blank"); }
