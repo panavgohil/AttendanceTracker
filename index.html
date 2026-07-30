@@ -4,109 +4,233 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stateline Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#0f172a; --card:rgba(30, 41, 59, 0.7); --text:#f1f5f9; --accent:#3b82f6; --border:rgba(255,255,255,0.1); }
-  body { margin:0; font-family:'Inter', system-ui; background:var(--bg); color:var(--text); min-height:100vh; }
-  
+  :root{
+    --void:#080b13; --deep:#0d1220; --deep2:#111729;
+    --glass:rgba(255,255,255,0.045); --glass-hi:rgba(255,255,255,0.08);
+    --border:rgba(255,255,255,0.09); --border-hi:rgba(255,255,255,0.16);
+    --text:#eef1f8; --dim:#8b95ab; --dimmer:#5c6478;
+    --cyan:#22d3ee; --violet:#a78bfa; --cyan-rgb:34,211,238; --violet-rgb:167,139,250;
+    --green:#34d399; --amber:#fbbf24; --red:#f87171; --blue:#60a5fa; --teal:#2dd4bf;
+    --font-display:'Sora',sans-serif; --font-body:'Inter',system-ui,sans-serif; --font-mono:'JetBrains Mono',monospace;
+    --radius:18px; --radius-sm:12px;
+    color-scheme: dark;
+  }
+  html[data-theme="light"]{
+    --void:#eef1f8; --deep:#e4e8f3; --deep2:#dde2f0;
+    --glass:rgba(255,255,255,0.55); --glass-hi:rgba(255,255,255,0.8);
+    --border:rgba(15,23,42,0.08); --border-hi:rgba(15,23,42,0.16);
+    --text:#131829; --dim:#5b6478; --dimmer:#828ba1;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:var(--font-body); background:var(--void); color:var(--text); min-height:100vh; position:relative; overflow-x:hidden; transition:background 0.4s ease, color 0.4s ease; }
+
+  /* --- AMBIENT BACKDROP --- */
+  .orb{ position:fixed; border-radius:50%; filter:blur(90px); opacity:0.35; z-index:0; pointer-events:none; animation:drift 26s ease-in-out infinite alternate; }
+  .orb1{ width:480px; height:480px; background:var(--cyan); top:-160px; left:-120px; }
+  .orb2{ width:420px; height:420px; background:var(--violet); bottom:-140px; right:-100px; animation-delay:-9s; }
+  .orb3{ width:300px; height:300px; background:var(--teal); top:40%; left:60%; opacity:0.18; animation-delay:-4s; }
+  html[data-theme="light"] .orb{ opacity:0.16; }
+  @keyframes drift{ from{ transform:translate(0,0) scale(1);} to{ transform:translate(40px,-30px) scale(1.08);} }
+  @media (prefers-reduced-motion: reduce){ .orb{ animation:none; } }
+
+  /* --- GLASS PRIMITIVE --- */
+  .glass{ background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(22px) saturate(140%); -webkit-backdrop-filter:blur(22px) saturate(140%); border-radius:var(--radius); box-shadow:0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04); }
+  html[data-theme="light"] .glass{ box-shadow:0 8px 28px rgba(30,41,80,0.08), inset 0 1px 0 rgba(255,255,255,0.6); }
+
   /* --- HEADER --- */
-  header { background: rgba(15, 23, 42, 0.95); padding: 0 40px; height: 80px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(10px); }
-  .brand-group { display: flex; flex-direction: column; justify-content: center; }
-  .brand { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 24px; text-transform: uppercase; color: white; letter-spacing: 2px; line-height: 1; }
-  .credit { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
-  
-  .right-area { display: flex; align-items: center; gap: 25px; }
-  .greeting-box { text-align: right; }
-  .greeting-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-  .user-name { font-family: 'Playfair Display', serif; font-size: 18px; color: white; font-weight: 700; }
-  .divider { height: 30px; width: 1px; background: var(--border); }
+  header{ position:relative; z-index:50; background:var(--glass); border-bottom:1px solid var(--border); backdrop-filter:blur(22px) saturate(140%); padding:0 32px; min-height:76px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; flex-wrap:wrap; gap:14px; }
+  .brand-group{ display:flex; align-items:center; gap:12px; }
+  .brand-mark{ width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg, var(--cyan), var(--violet)); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:16px; color:#0a0e18; flex-shrink:0; }
+  .brand{ font-family:var(--font-display); font-weight:800; font-size:19px; color:var(--text); letter-spacing:0.5px; line-height:1.1; }
+  .credit{ font-size:10px; color:var(--dimmer); font-weight:600; letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; }
 
-  .header-btn { background:rgba(59, 130, 246, 0.1); color:var(--accent); border:1px solid var(--accent); padding: 8px 16px; border-radius: 8px; font-weight: 600; transition: 0.2s; cursor: pointer; font-size: 13px; } 
-  .header-btn:hover { background: var(--accent); color: white; }
-  
-  .settings-btn { background:transparent; border:1px solid #475569; color:#94a3b8; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition:0.2s; font-size: 13px; font-weight: 500; } 
-  .settings-btn:hover { border-color:white; color:white; }
+  .right-area{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .greeting-box{ text-align:right; }
+  .greeting-label{ font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; font-weight:600; }
+  .user-name{ font-family:var(--font-display); font-size:16px; color:var(--text); font-weight:700; }
+  .divider{ height:28px; width:1px; background:var(--border); }
 
-  /* Semester Dropdown Styling */
-  .semester-control { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid #475569; border-radius: 8px; overflow: hidden; height: 35px; }
-  .semester-control select { background: transparent; border: none; padding: 0 12px; color: white; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; height: 100%; -webkit-appearance: none; appearance: none; }
-  .semester-control select option { background: #1e293b; color: white; }
-  .semester-control button { background: #334155; border: none; border-left: 1px solid #475569; color: white; padding: 0 12px; cursor: pointer; font-weight: bold; transition: 0.2s; height: 100%; display: flex; align-items: center; }
-  .semester-control button:hover { background: var(--accent); }
+  .icon-btn{ width:38px; height:38px; border-radius:10px; background:var(--glass); border:1px solid var(--border); color:var(--dim); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; transition:0.2s; }
+  .icon-btn:hover{ border-color:var(--border-hi); color:var(--text); transform:translateY(-1px); }
+
+  .pill-btn{ background:rgba(var(--cyan-rgb),0.12); color:var(--cyan); border:1px solid rgba(var(--cyan-rgb),0.4); padding:9px 16px; border-radius:10px; font-weight:600; transition:0.2s; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; font-family:var(--font-body); }
+  .pill-btn:hover{ background:var(--cyan); color:#031018; }
+  .pill-btn.ghost{ background:transparent; border-color:var(--border); color:var(--dim); }
+  .pill-btn.ghost:hover{ border-color:var(--border-hi); color:var(--text); background:var(--glass-hi); }
+
+  .semester-control{ display:flex; align-items:center; background:var(--glass); border:1px solid var(--border); border-radius:10px; overflow:hidden; height:38px; }
+  .semester-control select{ background:transparent; border:none; padding:0 12px; color:var(--text); font-size:13px; font-weight:600; outline:none; cursor:pointer; height:100%; font-family:var(--font-body); }
+  .semester-control select option{ background:#151b2c; color:white; }
+  .semester-control button{ background:rgba(255,255,255,0.05); border:none; border-left:1px solid var(--border); color:var(--text); padding:0 13px; cursor:pointer; font-weight:700; transition:0.2s; height:100%; }
+  .semester-control button:hover{ background:var(--cyan); color:#031018; }
 
   /* --- MENU --- */
-  .profile-menu { position:absolute; top:70px; right:20px; width:280px; background:#1e293b; border:1px solid var(--border); border-radius:16px; padding:20px; display:none; box-shadow:0 20px 50px rgba(0,0,0,0.5); z-index:100; backdrop-filter: blur(10px); }
-  .profile-menu.show { display:block; animation: fadeIn 0.2s ease-out; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-  .menu-item { margin-bottom:15px; }
-  .menu-label { font-size:12px; color:#94a3b8; margin-bottom:6px; display:block; font-weight: 600; }
-  .menu-input { width:100%; padding:10px; background:rgba(15, 23, 42, 0.6); border:1px solid var(--border); color:white; border-radius:8px; font-size:13px; outline:none; transition: border-color 0.2s; }
-  .menu-input:focus { border-color: var(--accent); }
-  .pass-group { display:flex; gap:5px; }
-  .toggle-vis { background:none; border:none; color:#94a3b8; cursor:pointer; font-size:14px; padding: 0 5px; } .toggle-vis:hover { color: white; }
-  
+  .profile-menu{ position:absolute; top:66px; right:20px; width:290px; background:var(--deep2); border:1px solid var(--border); border-radius:16px; padding:20px; display:none; box-shadow:0 24px 60px rgba(0,0,0,0.5); z-index:100; backdrop-filter:blur(18px); }
+  .profile-menu.show{ display:block; animation:fadeIn 0.2s ease-out; }
+  @keyframes fadeIn{ from{opacity:0;transform:translateY(-8px);} to{opacity:1;transform:translateY(0);} }
+  .menu-item{ margin-bottom:14px; }
+  .menu-label{ font-size:11px; color:var(--dim); margin-bottom:6px; display:block; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+  .menu-input{ width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid var(--border); color:var(--text); border-radius:8px; font-size:13px; outline:none; transition:border-color 0.2s; font-family:var(--font-body); }
+  .menu-input:focus{ border-color:var(--cyan); }
+  .pass-group{ display:flex; gap:5px; }
+  .toggle-vis{ background:none; border:none; color:var(--dim); cursor:pointer; font-size:14px; padding:0 5px; }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; }
+  .switch{ position:relative; width:40px; height:22px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background:rgba(255,255,255,0.15); border-radius:22px; cursor:pointer; transition:0.25s; }
+  .slider::before{ content:""; position:absolute; width:16px; height:16px; left:3px; top:3px; background:white; border-radius:50%; transition:0.25s; }
+  .switch input:checked + .slider{ background:var(--cyan); }
+  .switch input:checked + .slider::before{ transform:translateX(18px); }
+
   /* --- LAYOUT --- */
-  .container { max-width:1200px; margin:20px auto; padding:0 15px; display:flex; gap:20px; flex-wrap:wrap; }
-  .main { flex:3; min-width:300px; }
-  .sidebar { flex:1; min-width:280px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:25px; margin-bottom:20px; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
-  h2, h3 { margin-top:0; color:white; font-family: 'Playfair Display', serif; letter-spacing: 0.5px; } h2 { font-size: 22px; } h3 { font-size: 18px; color: var(--accent); }
-  
-  /* --- STATS & LISTS --- */
-  .stat-row { margin-bottom:15px; } .stat-head { display:flex; justify-content:space-between; font-size:14px; margin-bottom:6px; font-weight: 500; } .progress-bg { background:rgba(255,255,255,0.1); height:10px; border-radius:5px; overflow:hidden; } .progress-fill { height:100%; transition:width 0.5s ease; border-radius:5px; }
-  .p-green { background:#22c55e; } .p-orange { background:#f59e0b; } .p-red { background:#ef4444; }
-  .week-row { display:flex; border-bottom:1px solid var(--border); padding:12px 0; align-items:center; } .week-row:last-child { border-bottom:none; } .week-day { width:100px; font-weight:600; color:#94a3b8; font-size:14px; } .week-subjects { flex:1; display:flex; flex-wrap:wrap; gap:8px; }
-  .sub-tag { background:#334155; padding:4px 10px; border-radius:15px; font-size:12px; border:1px solid var(--border); font-weight: 500; } .sub-tag.long { border-color:#3b82f6; color:#bfdbfe; }
-  
-  /* --- SCHEDULE BUTTONS --- */
-  .subject-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px; margin-top:20px; }
-  .sub-btn { background:#1e293b; color:white; padding:15px; border:1px solid var(--border); border-radius:12px; display:flex; flex-direction:column; gap:10px; min-height:100px; transition:0.2s; position:relative; overflow:hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } .sub-btn:hover { background:#334155; border-color:var(--accent); transform: translateY(-2px); }
-  .sub-btn.long { grid-column: span 1; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border:1px solid #3b82f6; } .sub-btn.long::after { content:"2 HR"; position:absolute; top:10px; right:10px; font-size:10px; background:#3b82f6; padding:3px 6px; border-radius:4px; font-weight:700; letter-spacing: 0.5px; }
-  
-  .card-top { display:flex; justify-content:space-between; align-items:center; width:100%; } 
-  .reorder-controls { display:flex; gap:2px; } 
-  .move-btn { background:rgba(0,0,0,0.3); color:#94a3b8; padding:4px 8px; font-size:10px; border:1px solid var(--border); border-radius:6px; cursor:pointer; height:fit-content; transition: 0.2s; } .move-btn:hover { background:white; color:black; border-color: white; }
-  
-  .actions { display:flex; gap:5px; margin-top:auto; flex-wrap:wrap; } 
-  .act-btn { flex:1; padding:8px 0; font-size:12px; border-radius:8px; border:none; color:white; font-weight:700; cursor: pointer; transition: 0.2s; text-transform: uppercase; min-width: 40px; } 
-  .act-btn:hover { opacity: 0.9; transform: scale(1.05); }
-  
-  .bg-green { background:#16a34a; } .bg-red { background:#dc2626; } .bg-orange { background:#ea580c; } 
-  .bg-blue { background:#2563eb; } .bg-cyan { background:#0891b2; } .bg-purple { background:#9333ea; }
-  
+  .container{ max-width:1240px; margin:22px auto 90px; padding:0 16px; position:relative; z-index:1; }
+  .hero-grid{ display:grid; grid-template-columns:1.1fr 0.75fr 0.9fr; gap:18px; margin-bottom:18px; }
+  .content-grid{ display:flex; gap:18px; flex-wrap:wrap; }
+  .main{ flex:3; min-width:320px; display:flex; flex-direction:column; gap:18px; }
+  .sidebar{ flex:1; min-width:290px; display:flex; flex-direction:column; gap:18px; }
+  .card{ padding:24px; }
+  h2, h3{ margin-top:0; color:var(--text); font-family:var(--font-display); letter-spacing:0.2px; font-weight:700; }
+  h2{ font-size:20px; } h3{ font-size:15px; color:var(--cyan); text-transform:uppercase; letter-spacing:1px; font-size:12px; margin-bottom:16px;}
+  .sub{ font-size:12px; color:var(--dim); margin-bottom:15px; line-height:1.5; }
+  .mono{ font-family:var(--font-mono); }
+
+  /* --- HERO: RING --- */
+  .ring-wrap{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:8px; }
+  .ring-box{ position:relative; width:150px; height:150px; }
+  .ring-fill{ stroke-dashoffset: inherit; transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); filter:drop-shadow(0 0 6px currentColor); }
+  .ring-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring-pct{ font-family:var(--font-mono); font-size:30px; font-weight:600; }
+  .ring-label{ font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+  .hero-tag{ font-size:11px; padding:5px 12px; border-radius:20px; background:rgba(var(--cyan-rgb),0.1); border:1px solid rgba(var(--cyan-rgb),0.3); color:var(--cyan); font-weight:600; }
+
+  /* --- STAT CHIPS --- */
+  .stat-chip-row{ display:flex; flex-direction:column; gap:12px; height:100%; justify-content:center; }
+  .stat-chip{ display:flex; align-items:center; gap:14px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border); }
+  .chip-icon{ width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .chip-num{ font-family:var(--font-mono); font-size:18px; font-weight:600; line-height:1.1; }
+  .chip-lbl{ font-size:11px; color:var(--dim); }
+
+  /* --- BUNK CALCULATOR --- */
+  .calc-row{ display:flex; gap:8px; margin-bottom:10px; }
+  .calc-row select, .calc-row input{ flex:1; min-width:0; }
+  .calc-result{ background:rgba(var(--cyan-rgb),0.08); border:1px solid rgba(var(--cyan-rgb),0.25); border-radius:10px; padding:12px 14px; font-size:13px; color:var(--text); line-height:1.5; min-height:44px; display:flex; align-items:center; }
+  .calc-result b{ color:var(--cyan); font-family:var(--font-mono); }
+
+  /* --- SUBJECT RING TILES --- */
+  .stat-tiles{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:14px; }
+  .stat-tile{ background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:14px; padding:16px 12px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; transition:0.2s; }
+  .stat-tile:hover{ border-color:var(--border-hi); transform:translateY(-2px); }
+  .stat-tile-name{ font-size:12.5px; font-weight:600; color:var(--text); }
+  .stat-tile-sub{ font-size:10.5px; color:var(--dim); font-family:var(--font-mono); }
+  .stat-tile-note{ font-size:10.5px; margin-top:2px; }
+
+  /* --- HEATMAP --- */
+  .heatmap-scroll{ overflow-x:auto; padding-bottom:6px; }
+  .heatmap-grid{ display:grid; grid-auto-flow:column; grid-template-rows:repeat(7, 12px); gap:3px; width:max-content; }
+  .hm-cell{ width:12px; height:12px; border-radius:3px; background:rgba(255,255,255,0.06); }
+  .hm-good{ background:var(--green); } .hm-bad{ background:var(--red); } .hm-neutral{ background:var(--violet); opacity:0.6;}
+  .heatmap-legend{ display:flex; align-items:center; gap:8px; margin-top:12px; font-size:10.5px; color:var(--dim); }
+  .heatmap-legend .hm-cell{ width:10px; height:10px; }
+
+  /* --- WEEK ROW --- */
+  .week-row{ display:flex; border-bottom:1px solid var(--border); padding:12px 4px; align-items:center; }
+  .week-row:last-child{ border-bottom:none; }
+  .week-day{ width:100px; font-weight:600; color:var(--dim); font-size:13px; flex-shrink:0; }
+  .week-subjects{ flex:1; display:flex; flex-wrap:wrap; gap:8px; }
+  .sub-tag{ background:rgba(255,255,255,0.05); padding:4px 11px; border-radius:20px; font-size:12px; border:1px solid var(--border); font-weight:500; }
+  .sub-tag.long{ border-color:var(--violet); color:var(--violet); }
+
+  /* --- SCHEDULE / TODAY --- */
+  .subject-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:14px; margin-top:6px; }
+  .sub-btn{ background:rgba(255,255,255,0.03); color:var(--text); padding:16px; border:1px solid var(--border); border-radius:14px; display:flex; flex-direction:column; gap:10px; min-height:104px; transition:0.2s; position:relative; overflow:hidden; }
+  .sub-btn::before{ content:""; position:absolute; top:0; left:0; right:0; height:3px; background:var(--cyan); }
+  .sub-btn.long::before{ background:linear-gradient(90deg, var(--violet), var(--cyan)); }
+  .sub-btn:hover{ border-color:var(--border-hi); transform:translateY(-2px); background:rgba(255,255,255,0.05); }
+  .sub-btn.long::after{ content:"2 HR"; position:absolute; top:10px; right:10px; font-size:9px; background:rgba(var(--violet-rgb),0.2); color:var(--violet); padding:3px 7px; border-radius:5px; font-weight:700; letter-spacing:0.5px; }
+
+  .card-top{ display:flex; justify-content:space-between; align-items:center; width:100%; }
+  .reorder-controls{ display:flex; gap:3px; }
+  .move-btn{ background:rgba(0,0,0,0.25); color:var(--dim); padding:4px 8px; font-size:10px; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:0.2s; }
+  .move-btn:hover{ background:var(--text); color:var(--void); }
+
+  .actions{ display:flex; gap:5px; margin-top:auto; flex-wrap:wrap; }
+  .act-btn{ flex:1; padding:9px 0; font-size:11.5px; border-radius:8px; border:none; color:white; font-weight:700; cursor:pointer; transition:0.2s; text-transform:uppercase; min-width:38px; }
+  .act-btn:hover{ opacity:0.88; transform:scale(1.05); }
+  .bg-green{ background:#16a34a; } .bg-red{ background:#dc2626; } .bg-orange{ background:#ea580c; }
+  .bg-blue{ background:#2563eb; } .bg-cyan{ background:#0891b2; } .bg-purple{ background:#9333ea; }
+
   /* --- LEGEND --- */
-  .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-  .legend-item { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #cbd5e1; }
-  .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+  .legend-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:10px; }
+  .legend-item{ display:flex; align-items:center; gap:10px; font-size:12px; color:var(--dim); }
+  .legend-dot{ width:11px; height:11px; border-radius:4px; flex-shrink:0; }
+
+  /* --- LOW ATTENDANCE BANNER --- */
+  .warn-banner{ display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:12px; background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.3); color:#fecaca; font-size:13px; margin-bottom:16px; }
+  .warn-banner b{ color:#fca5a5; }
 
   /* --- FORMS --- */
-  .editor-box { background:#1e293b; padding:20px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px; } .hidden { display:none; }
-  .reschedule-box { background:rgba(147, 51, 234, 0.15); border:1px solid rgba(147, 51, 234, 0.4); padding:15px; border-radius:10px; margin-top:15px; }
-  label { display:block; font-size:12px; color:#94a3b8; margin:12px 0 6px; font-weight: 600; }
-  input, select { width:100%; padding:12px; background:rgba(0,0,0,0.2); border:1px solid var(--border); color:white; border-radius:10px; box-sizing:border-box; outline: none; transition: 0.3s; } input:focus, select:focus { border-color: var(--accent); background: rgba(0,0,0,0.3); }
-  .btn-full { width:100%; margin-top:15px; padding:12px; font-size:14px; cursor:pointer; border:none; border-radius:10px; transition:0.2s; font-weight: 600; display: flex; align-items: center; justify-content: center; } .btn-full:active { transform:scale(0.98); } .btn-full:hover { opacity: 0.9; }
-  .btn-save { background:linear-gradient(to right, #16a34a, #059669); color:white; margin-top:15px; }
-  .btn-logout { background:linear-gradient(to right, #ef4444, #dc2626); color:white; margin-top:10px; }
-  
-  #toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:white; color:black; padding:12px 24px; border-radius:50px; font-weight:600; display:none; z-index:100; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
-  #syncStatus { font-size:11px; margin-right:15px; color:#94a3b8; font-style:italic; display: flex; align-items: center; }
+  .editor-box{ background:rgba(255,255,255,0.03); padding:18px; border-radius:14px; border:1px solid var(--border); margin-bottom:16px; }
+  .reschedule-box{ background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.3); padding:14px; border-radius:10px; margin-top:14px; }
+  .hidden{ display:none !important; }
+  label{ display:block; font-size:11.5px; color:var(--dim); margin:12px 0 6px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; }
+  input, select{ width:100%; padding:11px; background:rgba(0,0,0,0.18); border:1px solid var(--border); color:var(--text); border-radius:10px; box-sizing:border-box; outline:none; transition:0.2s; font-family:var(--font-body); font-size:13px; }
+  input:focus, select:focus{ border-color:var(--cyan); background:rgba(0,0,0,0.28); }
+  html[data-theme="light"] input, html[data-theme="light"] select{ background:rgba(255,255,255,0.5); }
+  .btn-full{ width:100%; margin-top:14px; padding:12px; font-size:13.5px; cursor:pointer; border:none; border-radius:10px; transition:0.2s; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px; font-family:var(--font-body); }
+  .btn-full:active{ transform:scale(0.98); } .btn-full:hover{ opacity:0.9; }
+  .btn-save{ background:linear-gradient(to right, #16a34a, #059669); color:white; }
+  .btn-logout{ background:linear-gradient(to right, #ef4444, #dc2626); color:white; margin-top:8px; }
+  .btn-accent{ background:linear-gradient(to right, var(--cyan), #0891b2); color:#031018; }
+  .btn-violet{ background:linear-gradient(to right, var(--violet), #7c5ce0); color:white; }
+  .btn-outline{ background:transparent; border:1px solid var(--border-hi); color:var(--text); }
+  .btn-outline:hover{ border-color:var(--cyan); color:var(--cyan); }
+  .danger-link{ color:#f87171; background:none; border:1px solid rgba(248,113,113,0.4); width:auto; padding:8px 14px; border-radius:8px; font-size:12px; cursor:pointer; margin-top:6px; }
+  .danger-link:hover{ background:rgba(248,113,113,0.1); }
 
-  @media (max-width: 768px) {
-    header { height: auto; padding: 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
-    .right-area { width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 15px;}
-    .greeting-box { text-align: left; }
-    .divider { display: none; }
-    .subject-grid { grid-template-columns: 1fr; }
+  /* subject manage list rows */
+  .manage-list{ display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+  .manage-day-label{ font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--dim); margin:14px 0 6px; font-weight:700; }
+  .manage-row{ display:flex; align-items:center; justify-content:space-between; padding:9px 12px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid var(--border); font-size:13px; }
+  .manage-row .name{ font-weight:600; }
+  .manage-row .dur{ font-size:10.5px; color:var(--dim); margin-left:8px; font-family:var(--font-mono); }
+  .manage-row .row-actions{ display:flex; gap:6px; }
+  .mini-btn{ background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--dim); width:26px; height:26px; border-radius:7px; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; }
+  .mini-btn:hover{ color:var(--text); border-color:var(--border-hi); }
+  .mini-btn.del:hover{ color:#f87171; border-color:#f87171; }
+  .mini-btn.edit:hover{ color:var(--cyan); border-color:var(--cyan); }
+  .empty-note{ text-align:center; padding:14px; color:var(--dimmer); font-size:12px; font-style:italic; }
+
+  #toast{ position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:var(--text); color:var(--void); padding:11px 22px; border-radius:50px; font-weight:600; display:none; z-index:200; box-shadow:0 10px 30px rgba(0,0,0,0.5); font-size:13px; }
+  #syncStatus{ font-size:11px; color:var(--dim); font-style:italic; display:flex; align-items:center; }
+
+  /* --- MOBILE BOTTOM NAV --- */
+  .bottom-nav{ display:none; }
+  @media (max-width: 768px){
+    header{ padding:16px 18px; }
+    .hero-grid{ grid-template-columns:1fr; }
+    .subject-grid{ grid-template-columns:1fr; }
+    .bottom-nav{ display:flex; position:fixed; bottom:0; left:0; right:0; z-index:120; background:var(--deep2); border-top:1px solid var(--border); padding:8px 6px calc(8px + env(safe-area-inset-bottom)); justify-content:space-around; backdrop-filter:blur(20px); }
+    .bn-item{ display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--dim); background:none; border:none; font-size:10px; font-weight:600; cursor:pointer; padding:6px 10px; border-radius:10px; }
+    .bn-item span.ic{ font-size:17px; }
+    .bn-item.active{ color:var(--cyan); background:rgba(var(--cyan-rgb),0.1); }
+    .container{ margin-bottom:70px; }
   }
 </style>
 </head>
 <body>
-<script>window.onerror = function(msg, url, line) { alert("Code Error: " + msg + "\nLine: " + line); };</script>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<script>window.onerror = function(msg, url, line) { console.error("Code Error:", msg, "Line:", line); };</script>
 
 <header>
   <div class="brand-group">
-    <div class="brand">Stateline</div>
-    <div class="credit">By Panav Gohil</div>
+    <div class="brand-mark">S</div>
+    <div>
+      <div class="brand">Stateline</div>
+      <div class="credit">By Panav Gohil</div>
+    </div>
   </div>
 
   <div class="right-area">
@@ -114,25 +238,22 @@
       <div class="greeting-label">Welcome back</div>
       <div class="user-name">Hi, <span id="dispName">Guest</span></div>
     </div>
-
     <div class="divider"></div>
-
-    <div style="display:flex; align-items:center; gap:10px">
-      
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <div class="semester-control">
         <select id="semesterSelect" onchange="changeSemester()"></select>
         <button onclick="createNewSemester()" title="Add New Semester">+</button>
       </div>
-
       <span id="syncStatus"></span>
-      <button onclick="toggleEditor()" class="header-btn">✎ Schedule</button>
-      <button onclick="toggleProfile()" class="settings-btn">⚙ Settings</button>
+      <button onclick="toggleTheme()" class="icon-btn" id="themeBtn" title="Toggle theme">🌙</button>
+      <button onclick="toggleEditor()" class="pill-btn">✎ Schedule</button>
+      <button onclick="toggleProfile()" class="icon-btn" title="Settings">⚙</button>
     </div>
 
     <div class="profile-menu" id="profileMenu">
-      <h4 style="margin:0 0 15px; border-bottom:1px solid #334155; padding-bottom:10px; color:white; font-family:'Playfair Display',serif;">Account Settings</h4>
+      <h4 style="margin:0 0 15px; border-bottom:1px solid var(--border); padding-bottom:10px; color:var(--text); font-family:var(--font-display);">Account Settings</h4>
       <div class="menu-item">
-        <label class="menu-label">Branch</label>
+        <label class="menu-label" style="margin-top:0;">Branch</label>
         <input class="menu-input" id="profBranch">
       </div>
       <div class="menu-item">
@@ -142,6 +263,14 @@
           <button class="toggle-vis" onclick="togglePassVis()">👁️</button>
         </div>
       </div>
+      <div class="menu-item toggle-row">
+        <div>
+          <div style="font-size:13px;font-weight:600;">Weekly PDF report</div>
+          <div style="font-size:11px;color:var(--dim);">Emailed to your registered address</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="reportOptIn" onchange="toggleReportOptIn()"><span class="slider"></span></label>
+      </div>
+      <button class="btn-full btn-outline" onclick="sendReportNow()" id="sendReportBtn">📄 Email me this week's report</button>
       <button class="btn-full btn-save" onclick="updateProfile()">Update Details</button>
       <button class="btn-full btn-logout" onclick="logout()">Log Out</button>
     </div>
@@ -149,111 +278,194 @@
 </header>
 
 <div class="container">
-  <div class="main">
-    <div class="card">
-      <h3>Attendance Statistics</h3>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:15px;">Weighted: 1hr = 1pt, 2hr = 2pts. Showing data for <span id="statSemLabel" style="color:white; font-weight:bold;">Semester 2</span>.</p>
-      <div id="statsContainer"><div style="text-align:center;padding:10px;color:#64748b;">Loading stats...</div></div>
-    </div>
-    
-    <div id="editor" class="card hidden">
-      <h3>Manage Subjects</h3>
-      <div class="editor-box">
-        <label>Day</label><select id="edDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select>
-        <label>Subject</label><input id="edName" placeholder="e.g. NAS">
-        <label>Duration</label><select id="edDur"><option value="1">1 Hour</option><option value="2">2 Hours</option></select>
-        <button class="btn-full" onclick="addSubject()" style="background:linear-gradient(to right, #16a34a, #059669); color:white;">+ Add to Schedule</button>
-      </div>
-      <button onclick="clearSchedule()" style="color:#ef4444; background:none; border:1px solid #ef4444; width:auto; padding:8px 12px; border-radius: 8px;">Reset Current Semester</button>
-    </div>
-    
-    <div class="card">
-      <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h2 id="dayHeader" style="margin:0; font-family:'Inter', sans-serif; font-size: 20px;">Today</h2><span style="font-size:12px;color:#94a3b8; font-weight: 600;" id="dateDisp"></span></div>
-      <div id="subjectList" class="subject-grid"></div>
-      <div id="emptyMsg" style="text-align:center; padding:40px; display:none; color:#94a3b8">No classes today.</div>
-    </div>
-    
-    <div class="card">
-      <h3 style="font-size:14px; margin-bottom:15px;">Attendance Key</h3>
-      <div class="legend-grid">
-        <div class="legend-item"><div class="legend-dot bg-green"></div> <span>P - Attended</span></div>
-        <div class="legend-item"><div class="legend-dot bg-red"></div> <span>B - Bunked</span></div>
-        <div class="legend-item"><div class="legend-dot bg-orange"></div> <span>A - Absent</span></div>
-        <div class="legend-item"><div class="legend-dot bg-blue"></div> <span>CT - Cancelled by Teacher</span></div>
-        <div class="legend-item"><div class="legend-dot bg-cyan"></div> <span>CR - Cancelled by CR</span></div>
-        <div class="legend-item"><div class="legend-dot bg-purple"></div> <span>R - Rescheduled</span></div>
-      </div>
+
+  <div id="warnBannerWrap"></div>
+
+  <!-- HERO -->
+  <div class="hero-grid">
+    <div class="card glass ring-wrap">
+      <span class="hero-tag" id="statSemLabel">Semester 2</span>
+      <div class="ring-box" id="heroRingBox"></div>
+      <div class="sub" style="margin:0;">Overall weighted attendance</div>
     </div>
 
-    <div class="card"><h3>Weekly Schedule</h3><div id="weeklyContainer"></div></div>
+    <div class="card glass">
+      <h3>At a glance</h3>
+      <div class="stat-chip-row" id="glanceChips"></div>
+    </div>
 
+    <div class="card glass">
+      <h3>Bunk calculator</h3>
+      <div class="calc-row">
+        <select id="calcSubject"></select>
+        <input type="number" id="calcTarget" value="75" min="1" max="100" style="max-width:70px;">
+      </div>
+      <div class="calc-result" id="calcResult">Pick a subject to see how many classes you can skip or must attend.</div>
+    </div>
   </div>
-  <div class="sidebar">
-    <div class="card">
-      <h3>Manual Entry</h3>
-      <label>Date</label><input type="date" id="mDate">
-      <label>Day</label><select id="mDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select>
-      <label>Subject</label><input id="mSubject" list="mySubjects" placeholder="Select Subject"><datalist id="mySubjects"></datalist>
-      <label>Duration</label><select id="mWeight"><option value="1">1 Hour</option><option value="2">2 Hours</option></select>
-      <label>Status</label><select id="mStatus" onchange="toggleRescheduleBox()"><option>Attended</option><option>Bunked</option><option>Absent</option><option>Cancelled by Teacher</option><option>Cancelled by CR</option><option>Rescheduled</option></select>
-      <div id="rescheduleBox" class="reschedule-box hidden">
-        <label style="color:#e879f9">New Date</label><input type="date" id="rDate">
-        <label style="color:#e879f9">New Time</label><input type="time" id="rTime">
+
+  <div class="content-grid">
+    <div class="main">
+
+      <div class="card glass">
+        <h3>Attendance Statistics</h3>
+        <p class="sub">Weighted: 1hr = 1pt, 2hr = 2pts. Ring color reflects safety margin against your 75% target.</p>
+        <div id="statsContainer" class="stat-tiles"><div class="empty-note">Loading stats...</div></div>
       </div>
-      <label>Remark (Optional)</label><input id="mRemark" placeholder="e.g. Extra class">
-      <button class="btn-full" onclick="manual()" style="background:linear-gradient(to right, var(--accent), #2563eb); color:white;">Add Entry</button>
-      <div style="margin:25px 0; border-top:1px solid var(--border);"></div>
-      <button class="btn-full" onclick="exportMyData()" style="background:#1e293b; border: 1px solid var(--accent); color: var(--accent);">📥 Download Attendance Logs</button>
+
+      <div class="card glass">
+        <h3>Activity heatmap</h3>
+        <p class="sub">Last 12 weeks — green days had no absences, red days had at least one.</p>
+        <div class="heatmap-scroll"><div class="heatmap-grid" id="heatmapGrid"></div></div>
+        <div class="heatmap-legend">
+          <div class="hm-cell hm-good"></div><span>No bunks</span>
+          <div class="hm-cell hm-bad"></div><span>Missed class</span>
+          <div class="hm-cell hm-neutral"></div><span>Cancelled/Resched.</span>
+          <div class="hm-cell"></div><span>No record</span>
+        </div>
+      </div>
+
+      <div id="editor" class="card glass hidden">
+        <h3>Manage Subjects</h3>
+        <div class="editor-box">
+          <label>Day</label><select id="edDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select>
+          <label>Subject</label><input id="edName" placeholder="e.g. NAS">
+          <label>Duration</label><select id="edDur"><option value="1">1 Hour</option><option value="2">2 Hours</option></select>
+          <button class="btn-full btn-save" id="addSubBtn" onclick="addSubject()">+ Add to Schedule</button>
+          <button class="btn-full btn-outline hidden" id="cancelEditBtn" onclick="cancelSubjectEdit()">Cancel edit</button>
+        </div>
+        <div class="manage-list" id="manageList"></div>
+        <button onclick="clearSchedule()" class="danger-link">Reset entire semester instead</button>
+      </div>
+
+      <div class="card glass">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+          <h2 id="dayHeader" style="margin:0; font-size:19px;">Today</h2>
+          <span style="font-size:12px;color:var(--dim); font-weight:600;" id="dateDisp"></span>
+        </div>
+        <div id="subjectList" class="subject-grid"></div>
+        <div id="emptyMsg" class="empty-note hidden" style="padding:40px;">No classes today. Enjoy the break.</div>
+      </div>
+
+      <div class="card glass">
+        <h3 style="margin-bottom:14px;">Attendance Key</h3>
+        <div class="legend-grid">
+          <div class="legend-item"><div class="legend-dot bg-green"></div> P — Attended</div>
+          <div class="legend-item"><div class="legend-dot bg-red"></div> B — Bunked</div>
+          <div class="legend-item"><div class="legend-dot bg-orange"></div> A — Absent</div>
+          <div class="legend-item"><div class="legend-dot bg-blue"></div> CT — Cancelled by Teacher</div>
+          <div class="legend-item"><div class="legend-dot bg-cyan"></div> CR — Cancelled by CR</div>
+          <div class="legend-item"><div class="legend-dot bg-purple"></div> R — Rescheduled</div>
+        </div>
+      </div>
+
+      <div class="card glass"><h3>Weekly Schedule</h3><div id="weeklyContainer"></div></div>
+    </div>
+
+    <div class="sidebar">
+      <div class="card glass">
+        <h3>Manual Entry</h3>
+        <label style="margin-top:0;">Date</label><input type="date" id="mDate">
+        <label>Day</label><select id="mDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select>
+        <label>Subject</label><input id="mSubject" list="mySubjects" placeholder="Select Subject"><datalist id="mySubjects"></datalist>
+        <label>Duration</label><select id="mWeight"><option value="1">1 Hour</option><option value="2">2 Hours</option></select>
+        <label>Status</label><select id="mStatus" onchange="toggleRescheduleBox()"><option>Attended</option><option>Bunked</option><option>Absent</option><option>Cancelled by Teacher</option><option>Cancelled by CR</option><option>Rescheduled</option></select>
+        <div id="rescheduleBox" class="reschedule-box hidden">
+          <label style="color:var(--violet); margin-top:0;">New Date</label><input type="date" id="rDate">
+          <label style="color:var(--violet);">New Time</label><input type="time" id="rTime">
+        </div>
+        <label>Remark (Optional)</label><input id="mRemark" placeholder="e.g. Extra class">
+        <button class="btn-full btn-accent" onclick="manual()">Add Entry</button>
+        <div style="margin:20px 0; border-top:1px solid var(--border);"></div>
+        <button class="btn-full btn-outline" onclick="exportMyData()">📥 Download Attendance Logs</button>
+      </div>
+
+      <div class="card glass">
+        <h3>Streak</h3>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div style="font-size:34px;">🔥</div>
+          <div>
+            <div class="mono" style="font-size:26px;font-weight:600;" id="streakNum">0</div>
+            <div style="font-size:11px;color:var(--dim);">consecutive days without a bunk</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card glass">
+        <h3>Weekly report</h3>
+        <p class="sub">Turn this on to receive a PDF summary of your attendance every week by email, no manual export needed.</p>
+        <div class="toggle-row" style="padding-top:0;">
+          <div style="font-size:13px;font-weight:600;">Email me weekly</div>
+          <label class="switch"><input type="checkbox" id="reportOptIn2" onchange="toggleReportOptIn(true)"><span class="slider"></span></label>
+        </div>
+        <button class="btn-full btn-violet" onclick="sendReportNow()">📄 Send this week's report now</button>
+      </div>
     </div>
   </div>
 </div>
+
 <div id="toast">Saved!</div>
 
+<div class="bottom-nav">
+  <button class="bn-item active" onclick="scrollToSection('stats-anchor', this)"><span class="ic">📊</span>Stats</button>
+  <button class="bn-item" onclick="scrollToSection('today-anchor', this)"><span class="ic">📅</span>Today</button>
+  <button class="bn-item" onclick="scrollToSection('schedule-anchor', this)"><span class="ic">🗓</span>Schedule</button>
+  <button class="bn-item" onclick="toggleProfile()"><span class="ic">⚙</span>Settings</button>
+</div>
+
+<!-- config.js is gitignored — see config.example.js for the template -->
+<script src="config.js"></script>
 <script>
-// =================================================================
-// REPLACE WITH YOUR URL
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFpzOMDOgCxZXuC7HKiWRnywh-rGy6-RNpSxiakSdz_DrOi8etbwQnN4VdmGO8IjEViw/exec"; 
-// =================================================================
+if (!window.STATELINE_CONFIG || !window.STATELINE_CONFIG.SCRIPT_URL || window.STATELINE_CONFIG.SCRIPT_URL.indexOf("PASTE_YOUR") === 0) {
+  alert("Missing config.js — copy config.example.js to config.js and add your Apps Script URL.");
+}
+const SCRIPT_URL = (window.STATELINE_CONFIG && window.STATELINE_CONFIG.SCRIPT_URL) || "";
 
 const user = localStorage.getItem("userName") || "Guest";
 const roll = localStorage.getItem("userRoll");
 const branch = localStorage.getItem("userBranch");
 const pass = localStorage.getItem("userPass");
+const emailAddr = localStorage.getItem("userEmail") || "";
 
 if(!roll) { window.location.href = "login.html"; }
-document.getElementById("dispName").innerText = user.split(" ")[0]; 
+document.getElementById("dispName").innerText = user.split(" ")[0];
 document.getElementById("dateDisp").innerText = new Date().toLocaleDateString();
 
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const today = days[new Date().getDay()];
 document.getElementById("dayHeader").innerText = today;
+document.getElementById("editor").querySelector("#today-anchor");
+
+// give scroll anchors to key cards
+(function attachAnchors(){
+  const statsCard = document.querySelectorAll(".main .card.glass")[0];
+  if(statsCard) statsCard.id = "stats-anchor";
+})();
+
+// --- THEME ---
+function applyTheme(t){ document.documentElement.setAttribute("data-theme", t); document.getElementById("themeBtn").innerText = t === "light" ? "☀️" : "🌙"; }
+function toggleTheme(){ const cur = localStorage.getItem("theme") || "dark"; const next = cur === "dark" ? "light" : "dark"; localStorage.setItem("theme", next); applyTheme(next); }
+applyTheme(localStorage.getItem("theme") || "dark");
 
 // --- MIGRATION & SEMESTER LOGIC ---
-// Fixed default to Semester 2
 let semesters = { "Semester 2": { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] } };
 let currentSemester = "Semester 2";
+let rawHistory = [];
+let lastStats = {};
+let editingIndex = null, editingDay = null;
 
 function loadSemesters() {
   const rawSchedule = localStorage.getItem("mySchedule");
   if(rawSchedule) {
     try {
       let parsed = JSON.parse(rawSchedule);
-      if(parsed.Monday) { 
-        semesters = { "Semester 2": parsed }; // Migrate old flat schedule to Semester 2
-        localStorage.setItem("mySchedule", JSON.stringify(semesters));
-      } else {
-        semesters = parsed; // Already migrated
-      }
+      if(parsed.Monday) { semesters = { "Semester 2": parsed }; localStorage.setItem("mySchedule", JSON.stringify(semesters)); }
+      else { semesters = parsed; }
     } catch(e) {}
   }
-  
   let savedSem = localStorage.getItem("currentSemester");
-  if(savedSem && semesters[savedSem]) {
-    currentSemester = savedSem;
-  } else {
-    currentSemester = Object.keys(semesters)[0] || "Semester 2";
-    localStorage.setItem("currentSemester", currentSemester);
-  }
+  if(savedSem && semesters[savedSem]) { currentSemester = savedSem; }
+  else { currentSemester = Object.keys(semesters)[0] || "Semester 2"; localStorage.setItem("currentSemester", currentSemester); }
   document.getElementById("statSemLabel").innerText = currentSemester;
 }
 
@@ -272,7 +484,7 @@ function changeSemester() {
   currentSemester = document.getElementById("semesterSelect").value;
   localStorage.setItem("currentSemester", currentSemester);
   document.getElementById("statSemLabel").innerText = currentSemester;
-  init(); 
+  init();
 }
 
 function createNewSemester() {
@@ -283,11 +495,8 @@ function createNewSemester() {
     localStorage.setItem("currentSemester", currentSemester);
     localStorage.setItem("mySchedule", JSON.stringify(semesters));
     syncSchedule(); updateSemesterDropdown(); init();
-  } else if(semesters[name]) {
-    alert("Semester already exists!");
-  }
+  } else if(semesters[name]) { alert("Semester already exists!"); }
 }
-// ----------------------------------
 
 loadSemesters();
 init();
@@ -296,10 +505,20 @@ function init() {
   updateSemesterDropdown(); updateSubjectList(); renderSchedule(); renderWeekly(); fetchStats();
   document.getElementById("profBranch").value = branch || "";
   document.getElementById("profPass").value = pass || "";
+  const optIn = localStorage.getItem("reportOptIn") === "true";
+  document.getElementById("reportOptIn").checked = optIn;
+  document.getElementById("reportOptIn2").checked = optIn;
 }
 
 function toggleProfile() { document.getElementById("profileMenu").classList.toggle("show"); }
 function togglePassVis() { const x = document.getElementById("profPass"); x.type = x.type === "password" ? "text" : "password"; }
+
+function scrollToSection(anchorId, btn) {
+  document.querySelectorAll(".bn-item").forEach(b => b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  const el = document.getElementById(anchorId) || document.querySelector(".main");
+  el.scrollIntoView({ behavior:"smooth", block:"start" });
+}
 
 async function updateProfile() {
   const newBranch = document.getElementById("profBranch").value;
@@ -313,32 +532,61 @@ async function updateProfile() {
   }).catch(e => { alert("Connection Error."); btn.innerText = "Update Details"; btn.disabled = false; });
 }
 
-function syncSchedule() { document.getElementById("syncStatus").innerHTML = "<span>Syncing...</span>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ type: "save-schedule", roll: roll, schedule: JSON.stringify(semesters) }) }).then(r=>r.json()).then(res=>{ document.getElementById("syncStatus").innerHTML = res.status==="success" ? "<span style='color:#86efac'>Saved ✔</span>" : "<span style='color:#fca5a5'>Error ⚠</span>"; }); }
-
-async function sendData(day, subject, status, remark, weight, dateOverride) { 
-  const toast = document.getElementById("toast"); toast.innerText = "Saving..."; toast.style.display = "block"; 
-  try { 
-    const res = await fetch(SCRIPT_URL, { 
-      method: "POST", 
-      body: JSON.stringify({ name: user, roll: roll, date: dateOverride ? new Date(dateOverride).toLocaleDateString() : new Date().toLocaleDateString(), day: day, subject: subject, status: status, remark: remark, weight: parseInt(weight), semester: currentSemester }) 
-    }); 
-    const data = await res.json(); 
-    if(data.status === "success") { toast.innerText = "Saved!"; await fetchStats(); setTimeout(() => toast.style.display="none", 2000); } else throw new Error(data.message); 
-  } catch(e) { toast.innerText = "Error!"; setTimeout(() => toast.style.display="none", 3000); } 
+// --- WEEKLY PDF REPORT OPT-IN / ON-DEMAND SEND ---
+// NOTE: requires the backend Apps Script to support "type":"update-profile" with a
+// reportOptIn field, and a new "type":"send-report" action. See WEEKLY_REPORT.gs.
+function toggleReportOptIn(fromSidebar) {
+  const val = fromSidebar ? document.getElementById("reportOptIn2").checked : document.getElementById("reportOptIn").checked;
+  document.getElementById("reportOptIn").checked = val;
+  document.getElementById("reportOptIn2").checked = val;
+  localStorage.setItem("reportOptIn", val);
+  fetch(SCRIPT_URL, { method:"POST", body: JSON.stringify({ type:"update-profile", roll: roll, branch: branch, password: pass, reportOptIn: val }) })
+    .catch(()=>{});
+  const toast = document.getElementById("toast");
+  toast.innerText = val ? "Weekly reports enabled" : "Weekly reports disabled";
+  toast.style.display = "block"; setTimeout(()=>toast.style.display="none", 2000);
 }
 
-function renderSchedule() { 
-  const container = document.getElementById("subjectList"); container.innerHTML = ""; 
-  const subjects = semesters[currentSemester][today] || []; 
-  if(subjects.length === 0) { document.getElementById("emptyMsg").style.display = "block"; } else { document.getElementById("emptyMsg").style.display = "none"; 
-    subjects.forEach((sub, index) => { 
-      const cls = sub.duration == 2 ? "sub-btn long" : "sub-btn"; 
-      const showUp = index > 0 ? `<button class="move-btn" onclick="moveSubject(${index}, -1)">▲</button>` : ''; 
-      const showDown = index < subjects.length - 1 ? `<button class="move-btn" onclick="moveSubject(${index}, 1)">▼</button>` : ''; 
+function sendReportNow() {
+  const btn = event.target; const old = btn.innerText;
+  btn.innerText = "Sending..."; btn.disabled = true;
+  fetch(SCRIPT_URL, { method:"POST", body: JSON.stringify({ type:"send-report", roll: roll, semester: currentSemester }) })
+  .then(r=>r.json()).then(res=>{
+    btn.innerText = old; btn.disabled = false;
+    const toast = document.getElementById("toast");
+    toast.innerText = res.status === "success" ? "Report sent to your email!" : "Couldn't send report yet";
+    toast.style.display = "block"; setTimeout(()=>toast.style.display="none", 2500);
+  }).catch(()=>{ btn.innerText = old; btn.disabled = false; alert("Connection error — is the report backend deployed?"); });
+}
+
+function syncSchedule() { document.getElementById("syncStatus").innerHTML = "<span>Syncing...</span>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ type: "save-schedule", roll: roll, schedule: JSON.stringify(semesters) }) }).then(r=>r.json()).then(res=>{ document.getElementById("syncStatus").innerHTML = res.status==="success" ? "<span style='color:#86efac'>Saved ✔</span>" : "<span style='color:#fca5a5'>Error ⚠</span>"; }); }
+
+async function sendData(day, subject, status, remark, weight, dateOverride) {
+  const toast = document.getElementById("toast"); toast.innerText = "Saving..."; toast.style.display = "block";
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ name: user, roll: roll, date: dateOverride ? new Date(dateOverride).toLocaleDateString() : new Date().toLocaleDateString(), day: day, subject: subject, status: status, remark: remark, weight: parseInt(weight), semester: currentSemester })
+    });
+    const data = await res.json();
+    if(data.status === "success") { toast.innerText = "Saved!"; await fetchStats(); setTimeout(() => toast.style.display="none", 2000); } else throw new Error(data.message);
+  } catch(e) { toast.innerText = "Error!"; setTimeout(() => toast.style.display="none", 3000); }
+}
+
+function renderSchedule() {
+  const container = document.getElementById("subjectList"); container.innerHTML = "";
+  const subjects = semesters[currentSemester][today] || [];
+  if(subjects.length === 0) { document.getElementById("emptyMsg").classList.remove("hidden"); }
+  else {
+    document.getElementById("emptyMsg").classList.add("hidden");
+    subjects.forEach((sub, index) => {
+      const cls = sub.duration == 2 ? "sub-btn long" : "sub-btn";
+      const showUp = index > 0 ? `<button class="move-btn" onclick="moveSubject(${index}, -1)">▲</button>` : '';
+      const showDown = index < subjects.length - 1 ? `<button class="move-btn" onclick="moveSubject(${index}, 1)">▼</button>` : '';
       const html = `
         <div class="${cls}">
           <div class="card-top">
-            <div style="font-weight:bold;font-size:15px;">${sub.name}</div>
+            <div style="font-weight:bold;font-size:14.5px;">${sub.name}</div>
             <div class="reorder-controls">${showUp}${showDown}</div>
           </div>
           <div class="actions">
@@ -349,43 +597,271 @@ function renderSchedule() {
             <button class="act-btn bg-cyan" title="Cancelled by CR" onclick="mark('${sub.name}','Cancelled by CR',0)">CR</button>
             <button class="act-btn bg-purple" title="Rescheduled" onclick="mark('${sub.name}','Rescheduled',${sub.duration},'Rescheduled')">R</button>
           </div>
-        </div>`; 
-      container.innerHTML += html; 
-    }); 
-  } 
+        </div>`;
+      container.innerHTML += html;
+    });
+  }
+  const anchor = document.getElementById("dayHeader").closest(".card");
+  if(anchor) anchor.id = "today-anchor";
 }
 
-function renderWeekly() { const container = document.getElementById("weeklyContainer"); container.innerHTML = ""; ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].forEach(day => { const subjects = semesters[currentSemester][day] || []; let subHtml = subjects.length === 0 ? `<span style="font-size:12px;color:#64748b;font-style:italic;">No classes</span>` : subjects.map(s => `<span class="${s.duration==2?'sub-tag long':'sub-tag'}">${s.name}</span>`).join(""); container.innerHTML += `<div class="week-row"><div class="week-day">${day}</div><div class="week-subjects">${subHtml}</div></div>`; }); }
-
-async function fetchStats() { 
-  try { 
-    const res = await fetch(`${SCRIPT_URL}?type=history&roll=${encodeURIComponent(roll)}`); 
-    const history = await res.json(); 
-    const stats = {}; 
-    history.forEach(entry => { 
-      // Filter stats by current active semester
-      const entrySem = entry.semester || "Semester 2";
-      if(entrySem !== currentSemester) return;
-
-      const sub = entry.subject; 
-      const weight = parseInt(entry.weight) || 1; 
-      if (!stats[sub]) stats[sub] = { attended: 0, total: 0 }; 
-      if (entry.status === "Attended") { stats[sub].attended += weight; stats[sub].total += weight; } 
-      else if (entry.status === "Absent" || entry.status === "Bunked") { stats[sub].total += weight; } 
-    }); 
-    renderStats(stats); 
-  } catch (e) { document.getElementById("statsContainer").innerHTML = '<div style="text-align:center;font-size:12px;color:#ef4444">Failed to load stats</div>'; } 
+function renderWeekly() {
+  const container = document.getElementById("weeklyContainer"); container.innerHTML = "";
+  ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].forEach(day => {
+    const subjects = semesters[currentSemester][day] || [];
+    let subHtml = subjects.length === 0 ? `<span style="font-size:12px;color:var(--dimmer);font-style:italic;">No classes</span>` : subjects.map(s => `<span class="${s.duration==2?'sub-tag long':'sub-tag'}">${s.name}</span>`).join("");
+    container.innerHTML += `<div class="week-row"><div class="week-day">${day}</div><div class="week-subjects">${subHtml}</div></div>`;
+  });
+  const anchor = container.closest(".card");
+  if(anchor) anchor.id = "schedule-anchor";
 }
 
-function renderStats(stats) { const container = document.getElementById("statsContainer"); container.innerHTML = ""; if (Object.keys(stats).length === 0) { container.innerHTML = '<div style="text-align:center;font-size:12px;color:#64748b">No data yet for this semester</div>'; return; } for (const [sub, data] of Object.entries(stats)) { if (data.total === 0) continue; const pct = Math.round((data.attended / data.total) * 100); let color = pct >= 75 ? "p-green" : (pct >= 50 ? "p-orange" : "p-red"); container.innerHTML += `<div class="stat-row"><div class="stat-head"><span>${sub}</span><span>${pct}% <span style="opacity:0.5;font-size:11px;">(${data.attended}/${data.total}) pts</span></span></div><div class="progress-bg"><div class="progress-fill ${color}" style="width:${pct}%"></div></div></div>`; } }
+async function fetchStats() {
+  try {
+    const res = await fetch(`${SCRIPT_URL}?type=history&roll=${encodeURIComponent(roll)}`);
+    rawHistory = await res.json();
+    processHistory();
+  } catch (e) {
+    document.getElementById("statsContainer").innerHTML = '<div class="empty-note" style="color:#ef4444">Failed to load stats</div>';
+  }
+}
+
+function processHistory() {
+  const stats = {};
+  const dayStatus = {}; // date string -> {attended, absent, neutral}
+  rawHistory.forEach(entry => {
+    const entrySem = entry.semester || "Semester 2";
+    if(entrySem !== currentSemester) return;
+    const sub = entry.subject;
+    const weight = parseInt(entry.weight) || 1;
+    if (!stats[sub]) stats[sub] = { attended: 0, total: 0 };
+    if (entry.status === "Attended") { stats[sub].attended += weight; stats[sub].total += weight; }
+    else if (entry.status === "Absent" || entry.status === "Bunked") { stats[sub].total += weight; }
+
+    const dkey = entry.date;
+    if(!dkey) return;
+    if(!dayStatus[dkey]) dayStatus[dkey] = { attended:0, absent:0, neutral:0 };
+    if(entry.status === "Attended") dayStatus[dkey].attended++;
+    else if(entry.status === "Absent" || entry.status === "Bunked") dayStatus[dkey].absent++;
+    else dayStatus[dkey].neutral++;
+  });
+  lastStats = stats;
+  renderStats(stats);
+  renderHero(stats);
+  renderCalcSubjects(stats);
+  renderHeatmap(dayStatus);
+  renderStreak(dayStatus);
+  renderWarnBanner(stats);
+}
+
+function ringSVG(pct, size, stroke, color) {
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - Math.max(0, Math.min(100, pct)) / 100);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="${stroke}"/>
+    <circle class="ring-fill" style="stroke-dashoffset:${circumference}; color:${color};" data-final="${offset}" cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${circumference}" transform="rotate(-90 ${size/2} ${size/2})"/>
+  </svg>`;
+}
+function animateRings(container) {
+  requestAnimationFrame(() => {
+    container.querySelectorAll(".ring-fill").forEach(c => { c.style.strokeDashoffset = c.dataset.final; });
+  });
+}
+function statusColor(pct) { return pct >= 75 ? "var(--green)" : (pct >= 50 ? "var(--amber)" : "var(--red)"); }
+
+function renderHero(stats) {
+  let attended = 0, total = 0;
+  Object.values(stats).forEach(s => { attended += s.attended; total += s.total; });
+  const pct = total === 0 ? 0 : Math.round((attended/total)*100);
+  const box = document.getElementById("heroRingBox");
+  box.innerHTML = ringSVG(pct, 150, 12, statusColor(pct)) + `<div class="ring-center"><div class="ring-pct mono">${pct}%</div><div class="ring-label">${attended}/${total} pts</div></div>`;
+  animateRings(box);
+}
+
+function renderGlanceChips(stats, streak) {}
+
+function renderStats(stats) {
+  const container = document.getElementById("statsContainer");
+  container.innerHTML = "";
+  const entries = Object.entries(stats).filter(([,d]) => d.total > 0);
+  if (entries.length === 0) { container.innerHTML = '<div class="empty-note">No data yet for this semester</div>'; return; }
+  entries.forEach(([sub, data]) => {
+    const pct = Math.round((data.attended / data.total) * 100);
+    const color = statusColor(pct);
+    const note = computeBunkText(data, 75);
+    container.innerHTML += `<div class="stat-tile">
+      ${ringSVG(pct, 84, 8, color)}
+      <div class="stat-tile-name">${sub}</div>
+      <div class="stat-tile-sub">${data.attended}/${data.total} pts · ${pct}%</div>
+      <div class="stat-tile-note" style="color:${color}">${note.short}</div>
+    </div>`;
+  });
+  animateRings(container);
+
+  // glance chips
+  const below = entries.filter(([,d]) => Math.round((d.attended/d.total)*100) < 75).length;
+  const todayCount = (semesters[currentSemester][today] || []).length;
+  document.getElementById("glanceChips").innerHTML = `
+    <div class="stat-chip"><div class="chip-icon" style="background:rgba(248,113,113,0.15);color:var(--red);">⚠</div><div><div class="chip-num">${below}</div><div class="chip-lbl">subject${below===1?'':'s'} below 75%</div></div></div>
+    <div class="stat-chip"><div class="chip-icon" style="background:rgba(34,211,238,0.15);color:var(--cyan);">📚</div><div><div class="chip-num">${todayCount}</div><div class="chip-lbl">classes today</div></div></div>
+    <div class="stat-chip"><div class="chip-icon" style="background:rgba(167,139,250,0.15);color:var(--violet);">Σ</div><div><div class="chip-num">${entries.length}</div><div class="chip-lbl">subjects tracked</div></div></div>
+  `;
+}
+
+function computeBunkText(data, targetPct) {
+  const target = targetPct / 100;
+  if (data.total === 0) return { short:"No data yet", long:"No data yet for this subject." };
+  const currentPct = data.attended / data.total;
+  if (currentPct >= target) {
+    const safe = Math.max(0, Math.floor(data.attended / target - data.total));
+    return { short: safe > 0 ? `Safe to skip ${safe}` : "At the edge — attend next one", long: safe > 0 ? `You can skip the next ${safe} class${safe===1?'':'es'} and stay at or above ${targetPct}%.` : `You're right at ${targetPct}% — attend the next class to stay safe.` };
+  } else {
+    const need = Math.max(1, Math.ceil((target * data.total - data.attended) / (1 - target)));
+    return { short: `Attend next ${need}`, long: `Attend the next ${need} class${need===1?'':'es'} in a row to reach ${targetPct}%.` };
+  }
+}
+
+function renderCalcSubjects(stats) {
+  const select = document.getElementById("calcSubject");
+  const prevVal = select.value;
+  select.innerHTML = "";
+  Object.keys(stats).filter(s => stats[s].total > 0).forEach(sub => {
+    const opt = document.createElement("option"); opt.value = sub; opt.innerText = sub; select.appendChild(opt);
+  });
+  if(prevVal && stats[prevVal]) select.value = prevVal;
+  runCalc();
+}
+function runCalc() {
+  const sub = document.getElementById("calcSubject").value;
+  const target = parseInt(document.getElementById("calcTarget").value) || 75;
+  const result = document.getElementById("calcResult");
+  if(!sub || !lastStats[sub]) { result.innerHTML = "Pick a subject to see how many classes you can skip or must attend."; return; }
+  const note = computeBunkText(lastStats[sub], target);
+  result.innerHTML = note.long.replace(/(\d+)/g, "<b>$1</b>");
+}
+document.getElementById("calcSubject").addEventListener("change", runCalc);
+document.getElementById("calcTarget").addEventListener("input", runCalc);
+
+function renderWarnBanner(stats) {
+  const below = Object.entries(stats).filter(([,d]) => d.total > 0 && Math.round((d.attended/d.total)*100) < 75).map(([s])=>s);
+  const wrap = document.getElementById("warnBannerWrap");
+  if(below.length === 0) { wrap.innerHTML = ""; return; }
+  wrap.innerHTML = `<div class="warn-banner">⚠ <span><b>${below.length} subject${below.length===1?'':'s'}</b> below 75%: ${below.join(", ")}. Check the bunk calculator above before skipping again.</span></div>`;
+}
+
+function renderHeatmap(dayStatus) {
+  const grid = document.getElementById("heatmapGrid");
+  grid.innerHTML = "";
+  const totalDays = 84;
+  const end = new Date();
+  const cells = [];
+  for(let i = totalDays - 1; i >= 0; i--) {
+    const d = new Date(end); d.setDate(end.getDate() - i);
+    cells.push(d);
+  }
+  // pad so first column aligns to Sunday
+  const padCount = cells[0].getDay();
+  for(let i = 0; i < padCount; i++) grid.innerHTML += `<div class="hm-cell" style="visibility:hidden;"></div>`;
+  cells.forEach(d => {
+    const key = d.toLocaleDateString();
+    const s = dayStatus[key];
+    let cls = "hm-cell";
+    let title = key + " — no record";
+    if(s) {
+      if(s.absent > 0) { cls += " hm-bad"; title = `${key} — ${s.absent} missed`; }
+      else if(s.attended > 0) { cls += " hm-good"; title = `${key} — all attended`; }
+      else { cls += " hm-neutral"; title = `${key} — cancelled/rescheduled`; }
+    }
+    grid.innerHTML += `<div class="${cls}" title="${title}"></div>`;
+  });
+}
+
+function renderStreak(dayStatus) {
+  const dates = Object.keys(dayStatus)
+    .map(k => ({ key:k, date:new Date(k) }))
+    .filter(d => !isNaN(d.date))
+    .sort((a,b) => b.date - a.date);
+  let streak = 0;
+  for(const d of dates) {
+    const s = dayStatus[d.key];
+    if(s.absent > 0) break;
+    if(s.attended > 0) streak++;
+  }
+  document.getElementById("streakNum").innerText = streak;
+}
+
 function updateSubjectList() { const set = new Set(); Object.values(semesters[currentSemester]).forEach(arr => arr.forEach(s => set.add(s.name))); const datalist = document.getElementById("mySubjects"); datalist.innerHTML = ""; set.forEach(name => { const opt = document.createElement("option"); opt.value = name; datalist.appendChild(opt); }); }
 function moveSubject(index, direction) { const dayList = semesters[currentSemester][today]; if (!dayList) return; [dayList[index], dayList[index + direction]] = [dayList[index + direction], dayList[index]]; localStorage.setItem("mySchedule", JSON.stringify(semesters)); syncSchedule(); renderSchedule(); renderWeekly(); }
-function toggleEditor() { document.getElementById("editor").classList.toggle("hidden"); }
+function toggleEditor() { document.getElementById("editor").classList.toggle("hidden"); renderManageList(); }
 function toggleRescheduleBox() { const status = document.getElementById("mStatus").value; document.getElementById("rescheduleBox").classList.toggle("hidden", status !== "Rescheduled"); }
-function addSubject() { const day = document.getElementById("edDay").value; const name = document.getElementById("edName").value.trim(); const dur = document.getElementById("edDur").value; if(!name) return alert("Enter subject name"); semesters[currentSemester][day].push({ name: name, duration: parseInt(dur) }); localStorage.setItem("mySchedule", JSON.stringify(semesters)); syncSchedule(); updateSubjectList(); renderWeekly(); if(day === today) renderSchedule(); }
-function clearSchedule() { if(confirm(`Delete all subjects for ${currentSemester}?`)) { semesters[currentSemester] = { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] }; localStorage.setItem("mySchedule", JSON.stringify(semesters)); syncSchedule(); location.reload(); } }
+
+function renderManageList() {
+  const container = document.getElementById("manageList");
+  container.innerHTML = "";
+  ["Monday","Tuesday","Wednesday","Thursday","Friday"].forEach(day => {
+    const subjects = semesters[currentSemester][day] || [];
+    container.innerHTML += `<div class="manage-day-label">${day}</div>`;
+    if(subjects.length === 0) { container.innerHTML += `<div class="empty-note" style="padding:6px 0;">No subjects yet</div>`; return; }
+    subjects.forEach((s, i) => {
+      container.innerHTML += `<div class="manage-row">
+        <div><span class="name">${s.name}</span><span class="dur">${s.duration}HR</span></div>
+        <div class="row-actions">
+          <button class="mini-btn edit" onclick="editSubjectStart('${day}', ${i})" title="Edit">✎</button>
+          <button class="mini-btn del" onclick="deleteSubject('${day}', ${i})" title="Delete">✕</button>
+        </div>
+      </div>`;
+    });
+  });
+}
+
+function editSubjectStart(day, index) {
+  const sub = semesters[currentSemester][day][index];
+  if(!sub) return;
+  editingDay = day; editingIndex = index;
+  document.getElementById("edDay").value = day;
+  document.getElementById("edName").value = sub.name;
+  document.getElementById("edDur").value = sub.duration;
+  document.getElementById("addSubBtn").innerText = "✓ Update Subject";
+  document.getElementById("cancelEditBtn").classList.remove("hidden");
+  document.getElementById("edName").focus();
+}
+function cancelSubjectEdit() {
+  editingDay = null; editingIndex = null;
+  document.getElementById("edName").value = "";
+  document.getElementById("addSubBtn").innerText = "+ Add to Schedule";
+  document.getElementById("cancelEditBtn").classList.add("hidden");
+}
+function deleteSubject(day, index) {
+  semesters[currentSemester][day].splice(index, 1);
+  localStorage.setItem("mySchedule", JSON.stringify(semesters));
+  syncSchedule(); updateSubjectList(); renderWeekly(); renderManageList();
+  if(day === today) renderSchedule();
+  const toast = document.getElementById("toast");
+  toast.innerText = "Subject removed"; toast.style.display = "block"; setTimeout(()=>toast.style.display="none", 1800);
+}
+
+function addSubject() {
+  const day = document.getElementById("edDay").value;
+  const name = document.getElementById("edName").value.trim();
+  const dur = document.getElementById("edDur").value;
+  if(!name) return alert("Enter subject name");
+
+  if(editingIndex !== null && editingDay) {
+    semesters[currentSemester][editingDay][editingIndex] = { name, duration: parseInt(dur) };
+    cancelSubjectEdit();
+  } else {
+    semesters[currentSemester][day].push({ name, duration: parseInt(dur) });
+    document.getElementById("edName").value = "";
+  }
+  localStorage.setItem("mySchedule", JSON.stringify(semesters));
+  syncSchedule(); updateSubjectList(); renderWeekly(); renderManageList();
+  if(day === today || editingDay === today) renderSchedule();
+}
+
+function clearSchedule() { if(confirm(`Delete all subjects for ${currentSemester}? Use the edit/delete icons above if you only want to change a few.`)) { semesters[currentSemester] = { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[] }; localStorage.setItem("mySchedule", JSON.stringify(semesters)); syncSchedule(); location.reload(); } }
 function mark(subject, status, weight, remark="") { sendData(today, subject, status, remark, weight); }
-function manual() { const d = document.getElementById("mDate").value; if(!d) return alert("Select date"); const sub = document.getElementById("mSubject").value; if(!sub) return alert("Enter subject"); const weight = document.getElementById("mWeight").value; const status = document.getElementById("mStatus").value; let rem = document.getElementById("mRemark").value; if(status === "Rescheduled") { const rDate = document.getElementById("rDate").value; const rTime = document.getElementById("rTime").value; if(rDate) rem += ` (To: ${rDate} ${rTime})`; } const btn = document.querySelector(".sidebar .btn-full"); const oldText = btn.innerText; btn.innerText = "Processing..."; btn.disabled = true; sendData(document.getElementById("mDay").value, sub, status, rem, weight, d).then(() => { btn.innerText = oldText; btn.disabled = false; document.getElementById("mSubject").value = ""; document.getElementById("mRemark").value = ""; }); }
+function manual() { const d = document.getElementById("mDate").value; if(!d) return alert("Select date"); const sub = document.getElementById("mSubject").value; if(!sub) return alert("Enter subject"); const weight = document.getElementById("mWeight").value; const status = document.getElementById("mStatus").value; let rem = document.getElementById("mRemark").value; if(status === "Rescheduled") { const rDate = document.getElementById("rDate").value; const rTime = document.getElementById("rTime").value; if(rDate) rem += ` (To: ${rDate} ${rTime})`; } const btn = document.querySelector(".sidebar .btn-accent"); const oldText = btn.innerText; btn.innerText = "Processing..."; btn.disabled = true; sendData(document.getElementById("mDay").value, sub, status, rem, weight, d).then(() => { btn.innerText = oldText; btn.disabled = false; document.getElementById("mSubject").value = ""; document.getElementById("mRemark").value = ""; }); }
 function exportMyData() { window.open(`${SCRIPT_URL}?roll=${encodeURIComponent(roll)}`, "_blank"); }
 function logout() { if(confirm("Log out?")) { localStorage.clear(); window.location.href = "login.html"; } }
 </script>
